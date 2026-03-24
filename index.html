@@ -405,7 +405,7 @@
   <div class="modal-box" style="max-width:420px;">
     <div class="modal-header"><h2>管理員登入</h2><button class="modal-close" onclick="closeModal('loginModal')">✕</button></div>
     <div class="modal-body">
-      <p style="font-size:17px;color:var(--text-mid);margin-bottom:20px;line-height:1.8;">請使用 Google 帳號登入管理後台<br><strong style="color:var(--wood-dark);">enzdwllg@gmail.com</strong></p>
+      <p style="font-size:17px;color:var(--text-mid);margin-bottom:20px;line-height:1.8;">請使用 Google 帳號登入管理後台<br><strong style="color:var(--wood-dark);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b4d1daced0c3d8d8d3f4d3d9d5ddd89ad7dbd9">[email&#160;protected]</a></strong></p>
       <button id="googleLoginBtn" onclick="doGoogleLogin()" style="width:100%;padding:16px;background:#fff;border:2px solid #ddd;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Noto Sans TC',sans-serif;font-weight:700;color:#333;">
         <svg width="24" height="24" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         使用 Google 帳號登入
@@ -425,7 +425,7 @@
 </footer>
 
 <!-- Firebase (ES Module via type=module) -->
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
@@ -610,26 +610,76 @@ window.proceedToOrder=()=>{
   closeModal('productModal'); openModal('orderModal');
 };
 
-/* ── 送出訂單 ─────────────────────────────────────── */
+/* ── 送出訂單 → 呼叫 Netlify Function → 跳轉綠界 ── */
 window.submitOrder=async()=>{
   const name=$('buyerName').value.trim(), phone=$('buyerPhone').value.trim(), addr=$('buyerAddr').value.trim();
   if(!name||!phone||!addr){toast('⚠️ 請填寫姓名、手機及地址');return;}
-  const qty=parseInt($('sQty').textContent)||1, total=currentProduct.price*qty;
-  const orderId='ORD-'+Date.now().toString().slice(-8);
-  const btn=$('btnSubmit'); btn.textContent='⏳ 處理中...'; btn.disabled=true;
+  if(!/^09\d{8}$/.test(phone.replace(/[-\s]/g,''))){toast('⚠️ 手機號碼格式不正確');return;}
+
+  const qty   = parseInt($('sQty').textContent)||1;
+  const total = currentProduct.price * qty;
+  // 綠界金額必須為整數且 ≥ 1
+  if(total < 1){toast('⚠️ 金額異常，請重新選購');return;}
+
+  const orderId = 'ORD-'+Date.now().toString().slice(-8);
+  const btn=$('btnSubmit'); btn.textContent='⏳ 建立訂單中...'; btn.disabled=true;
+
   try{
+    // 1. 先把訂單存入 Firebase（status: 'pending'，等付款完成再改 paid）
     await setDoc(doc(db,'orders',orderId),{
-      product:currentProduct.name, productId:currentProduct.id||'',
-      qty, total, name, phone,
-      email:$('buyerEmail').value,
-      addr, payment:$('payMethod').value,
-      note:$('buyerNote').value,
-      status:'paid', createdAt:serverTimestamp()
+      product:   currentProduct.name,
+      productId: currentProduct.id||'',
+      qty, total, name,
+      phone: phone.replace(/[-\s]/g,''),
+      email: $('buyerEmail').value.trim(),
+      addr,
+      note:    $('buyerNote').value.trim(),
+      status:  'pending',   // 待付款
+      createdAt: serverTimestamp(),
     });
-    closeModal('orderModal'); toast('✅ 訂單成立！編號：'+orderId,4000);
-    setTimeout(()=>alert(`✅ 訂單成立！\n\n訂單編號：${orderId}\n商品：${currentProduct.name} × ${qty}\n金額：NT$${total.toLocaleString()}\n\n【正式上線後將自動跳轉至綠界付款頁面】\n\n請記下訂單編號，可至「查詢訂單」查看狀態。`),400);
-  }catch(e){toast('❌ 失敗：'+e.message);}
-  finally{btn.textContent='確認訂購 · 前往付款 →';btn.disabled=false;}
+
+    toast('✅ 訂單建立成功，前往付款中...', 3000);
+    btn.textContent='⏳ 跳轉付款中...';
+
+    // 2. 向 Netlify Function 請求綠界付款參數
+    const resp = await fetch('/.netlify/functions/create-payment', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        orderId,
+        productName: `${currentProduct.name} x${qty}`,
+        totalAmount: total,
+        buyerEmail:  $('buyerEmail').value.trim(),
+        siteUrl:     window.location.origin,
+      }),
+    });
+
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({error:'付款服務錯誤'}));
+      throw new Error(err.error||'付款服務錯誤');
+    }
+
+    const {ecpayUrl, params} = await resp.json();
+
+    // 3. 動態建立 form 並自動提交到綠界
+    closeModal('orderModal');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = ecpayUrl;
+    form.style.display = 'none';
+    for(const [k,v] of Object.entries(params)){
+      const inp = document.createElement('input');
+      inp.type='hidden'; inp.name=k; inp.value=v;
+      form.appendChild(inp);
+    }
+    document.body.appendChild(form);
+    form.submit(); // ← 跳轉到綠界付款頁面
+
+  }catch(e){
+    toast('❌ 訂單失敗：'+e.message, 4000);
+    btn.textContent='確認訂購 · 前往付款 →';
+    btn.disabled=false;
+  }
 };
 
 /* ── 查詢訂單 ─────────────────────────────────────── */
