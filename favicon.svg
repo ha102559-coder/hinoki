@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Wood grain radial gradient -->
+    <radialGradient id="bg" cx="50%" cy="45%" r="50%">
+      <stop offset="0%"   stop-color="#c8922a"/>
+      <stop offset="55%"  stop-color="#7a3e14"/>
+      <stop offset="100%" stop-color="#3d1f0a"/>
+    </radialGradient>
+
+    <!-- Gold ring gradient -->
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#f0c040"/>
+      <stop offset="50%"  stop-color="#c8922a"/>
+      <stop offset="100%" stop-color="#f0c040"/>
+    </linearGradient>
+
+    <!-- Leaf green gradient -->
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#5fa34f"/>
+      <stop offset="100%" stop-color="#2d5a27"/>
+    </linearGradient>
+
+    <!-- Drop gradient -->
+    <linearGradient id="drop" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%"   stop-color="#d4f0ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#7ec8e3" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="32" cy="32" r="30" fill="url(#bg)"/>
+
+  <!-- Gold border ring -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="url(#ring)" stroke-width="2.5"/>
+
+  <!-- Inner subtle ring -->
+  <circle cx="32" cy="32" r="26.5" fill="none" stroke="rgba(200,146,42,0.3)" stroke-width="0.8"/>
+
+  <!-- Hinoki cypress tree: trunk -->
+  <rect x="30.5" y="42" width="3" height="9" rx="1" fill="#3d1f0a"/>
+
+  <!-- Tree canopy layers (stylised conical cypress) -->
+  <!-- Layer 3 (bottom, widest) -->
+  <polygon points="32,30 21,44 43,44" fill="url(#leaf)" opacity="0.92"/>
+  <!-- Layer 2 (middle) -->
+  <polygon points="32,22 23,36 41,36" fill="url(#leaf)" opacity="0.95"/>
+  <!-- Layer 1 (top, narrowest) -->
+  <polygon points="32,14 25.5,27 38.5,27" fill="url(#leaf)"/>
+
+  <!-- Highlight on tree top -->
+  <polygon points="32,14 29,20 32,20" fill="rgba(255,255,255,0.18)"/>
+
+  <!-- Small gold dot accent bottom-left -->
+  <circle cx="18" cy="46" r="2" fill="#c8922a" opacity="0.7"/>
+  <circle cx="18" cy="46" r="1" fill="#f0c040" opacity="0.8"/>
+</svg>
