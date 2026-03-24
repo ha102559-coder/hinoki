@@ -135,7 +135,7 @@
   .order-result-card{background:#fff;border:2px solid var(--border-warm);border-radius:12px;padding:20px;display:none;margin-top:20px;}
   .order-result-card.show{display:block;}
   .status-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:16px;font-weight:700;margin-bottom:14px;}
-  .s-paid{background:#d4edda;color:#155724;} .s-shipping{background:#fff3cd;color:#856404;} .s-delivered{background:#cce5ff;color:#004085;}
+  .s-paid{background:#d4edda;color:#155724;} .s-shipping{background:#fff3cd;color:#856404;} .s-delivered{background:#cce5ff;color:#004085;} .s-pending{background:#fff3cd;color:#856404;} .s-failed{background:#f8d7da;color:#721c24;}
   .order-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #ddd;font-size:17px;}
   .order-row .key{color:#888;} .order-row .val{font-weight:700;color:var(--wood-dark);}
 
@@ -189,6 +189,23 @@
 
   @media(max-width:640px){.logo-text .main-title{font-size:20px;}nav a{font-size:15px;padding:8px 14px;}.product-grid{grid-template-columns:1fr 1fr;gap:14px;}.modal-body{padding:18px;}}
   @media(max-width:420px){.product-grid{grid-template-columns:1fr;}.header-top{padding:10px 14px;}}
+
+  /* ── ADMIN ORDER TABLE ── */
+  .admin-order-card{background:#fff;border:2px solid var(--cream-dark);border-radius:12px;padding:20px;margin-bottom:16px;transition:border-color .2s;}
+  .admin-order-card:hover{border-color:var(--border-warm);}
+  .admin-order-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;}
+  .admin-order-id{font-family:'Noto Serif TC',serif;font-size:18px;font-weight:900;color:var(--wood-dark);}
+  .admin-order-time{font-size:14px;color:#aaa;}
+  .admin-order-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 20px;margin-bottom:16px;}
+  .admin-order-field .key{font-size:13px;color:#aaa;margin-bottom:2px;}
+  .admin-order-field .val{font-size:16px;font-weight:700;color:var(--text-dark);word-break:break-all;}
+  .admin-order-field .val.price{color:var(--red-taiwan);font-size:20px;}
+  .status-select{padding:10px 14px;font-size:16px;border:2px solid var(--border-warm);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--wood-dark);background:var(--cream);cursor:pointer;font-weight:700;}
+  .btn-update-status{padding:10px 20px;background:var(--green-deep);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+  .btn-update-status:hover{background:var(--green-mid);}
+  .btn-update-status:disabled{opacity:.5;cursor:not-allowed;}
+  .admin-no-orders{text-align:center;padding:60px;color:#aaa;font-size:18px;}
+
 </style>
 </head>
 <body>
@@ -199,6 +216,7 @@
   <span class="admin-label">🌿 管理員模式</span>
   <button class="btn-aa" onclick="openAddProduct()">＋ 上架新商品</button>
   <button class="btn-aa" style="background:var(--green-deep)" onclick="openEditIntro()">✏️ 編輯自我介紹</button>
+  <button class="btn-aa" style="background:var(--wood-mid)" onclick="showPage('admin-orders')">📋 訂單管理</button>
   <button class="btn-aa" style="background:#555" onclick="doLogout()">登出</button>
 </div>
 
@@ -415,6 +433,33 @@
   </div>
 </div>
 
+
+<!-- ══ 管理員訂單後台 ══ -->
+<div class="page" id="page-admin-orders">
+  <div class="section-title"><h2>📋 訂單管理後台</h2><p>查看所有訂單，更新出貨狀態</p></div>
+  <div style="max-width:1100px;margin:0 auto;padding:0 20px 60px;">
+
+    <!-- 篩選列 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;align-items:center;">
+      <select id="adminStatusFilter" onchange="loadAdminOrders()" style="padding:12px 16px;font-size:17px;border:2px solid var(--cream-dark);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--text-dark);background:#fff;cursor:pointer;">
+        <option value="">全部訂單</option>
+        <option value="pending">⏳ 待付款</option>
+        <option value="paid">✅ 已付款</option>
+        <option value="shipping">🚚 出貨中</option>
+        <option value="delivered">📦 已送達</option>
+        <option value="payment_failed">❌ 付款失敗</option>
+      </select>
+      <button onclick="loadAdminOrders()" style="padding:12px 22px;background:var(--wood-warm);color:#fff;border:none;border-radius:8px;font-size:17px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">🔄 重新整理</button>
+      <span id="adminOrderCount" style="font-size:16px;color:#888;"></span>
+    </div>
+
+    <!-- 訂單列表 -->
+    <div id="adminOrderList">
+      <div style="text-align:center;padding:40px;color:var(--wood-warm);font-size:18px;">⏳ 載入中...</div>
+    </div>
+  </div>
+</div>
+
 <div class="deco-border"></div>
 <footer>
   <div class="brand">🌲 台灣紅檜精油</div>
@@ -476,6 +521,7 @@ window.showPage = id => {
   $('page-'+id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='contact') listenMessages();
+  if(id==='admin-orders') { if(isAdmin) loadAdminOrders(); else { showPage('home'); toast('⚠️ 請先登入管理員'); } }
 };
 window.closeModal = id => $(id).classList.remove('active');
 const openModal  = id => $(id).classList.add('active');
@@ -698,7 +744,7 @@ window.queryOrder=async()=>{
       snap.forEach(d=>{if(d.data().phone===phone)found={id:d.id,...d.data()};});
     }
     if(!found){toast('⚠️ 查無此訂單，請確認號碼或編號');return;}
-    const sm={paid:{l:'✅ 已付款',c:'s-paid'},shipping:{l:'🚚 出貨中',c:'s-shipping'},delivered:{l:'📦 已送達',c:'s-delivered'}};
+    const sm={paid:{l:'✅ 已付款',c:'s-paid'},shipping:{l:'🚚 出貨中',c:'s-shipping'},delivered:{l:'📦 已送達',c:'s-delivered'},pending:{l:'⏳ 待付款',c:'s-pending'},payment_failed:{l:'❌ 付款失敗',c:'s-failed'}};
     const st=sm[found.status]||sm.paid;
     $('orderStatusBadge').textContent=st.l; $('orderStatusBadge').className='status-badge '+st.c;
     $('oNo').textContent=found.id; $('oProd').textContent=found.product;
@@ -805,6 +851,135 @@ window.saveIntro=async()=>{
   const text=$('introContent').value.trim(); if(!text)return;
   try{await setDoc(doc(db,'settings','intro'),{text}); closeModal('introModal'); showIntro(text); toast('✅ 自我介紹已儲存');}
   catch(e){toast('儲存失敗：'+e.message);}
+};
+
+
+/* ── 管理員訂單後台 ─────────────────────────────── */
+const STATUS_MAP = {
+  pending:         { l:'⏳ 待付款',   c:'s-pending'  },
+  paid:            { l:'✅ 已付款',   c:'s-paid'     },
+  shipping:        { l:'🚚 出貨中',   c:'s-shipping' },
+  delivered:       { l:'📦 已送達',   c:'s-delivered'},
+  payment_failed:  { l:'❌ 付款失敗', c:'s-failed'   },
+};
+
+window.loadAdminOrders = async function() {
+  if (!isAdmin) { toast('⚠️ 請先登入管理員'); return; }
+  const list = $('adminOrderList');
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--wood-warm);font-size:18px;">⏳ 載入訂單中...</div>';
+
+  try {
+    const filterStatus = $('adminStatusFilter')?.value || '';
+    const snap = await getDocs(query(collection(db,'orders'), orderBy('createdAt','desc')));
+    let orders = [];
+    snap.forEach(d => orders.push({ id:d.id, ...d.data() }));
+
+    // 篩選
+    if (filterStatus) orders = orders.filter(o => o.status === filterStatus);
+
+    $('adminOrderCount').textContent = `共 ${orders.length} 筆`;
+
+    if (!orders.length) {
+      list.innerHTML = '<div class="admin-no-orders">📭 目前沒有符合的訂單</div>';
+      return;
+    }
+
+    list.innerHTML = orders.map(o => {
+      const ts  = o.createdAt?.toDate?.();
+      const t   = ts ? ts.toLocaleString('zh-TW') : '-';
+      const st  = STATUS_MAP[o.status] || STATUS_MAP.pending;
+      const amt = 'NT$' + Number(o.total||0).toLocaleString();
+
+      return `<div class="admin-order-card">
+        <div class="admin-order-top">
+          <div>
+            <div class="admin-order-id">${esc(o.id)}</div>
+            <div class="admin-order-time">${t}</div>
+          </div>
+          <span class="status-badge ${st.c}" style="margin:0;">${st.l}</span>
+        </div>
+
+        <div class="admin-order-grid">
+          <div class="admin-order-field"><div class="key">商品</div><div class="val">${esc(o.product||'-')}</div></div>
+          <div class="admin-order-field"><div class="key">數量</div><div class="val">${o.qty||1} 瓶</div></div>
+          <div class="admin-order-field"><div class="key">金額</div><div class="val price">${amt}</div></div>
+          <div class="admin-order-field"><div class="key">收件人</div><div class="val">${esc(o.name||'-')}</div></div>
+          <div class="admin-order-field"><div class="key">手機</div><div class="val">${esc(o.phone||'-')}</div></div>
+          <div class="admin-order-field"><div class="key">地址</div><div class="val">${esc(o.addr||'-')}</div></div>
+          ${o.email ? `<div class="admin-order-field"><div class="key">Email</div><div class="val">${esc(o.email)}</div></div>` : ''}
+          ${o.note  ? `<div class="admin-order-field"><div class="key">備註</div><div class="val">${esc(o.note)}</div></div>` : ''}
+        </div>
+
+        <!-- 更新狀態列 -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-top:2px dashed var(--cream-dark);padding-top:14px;">
+          <label style="font-size:16px;font-weight:700;color:var(--wood-dark);white-space:nowrap;">更新狀態：</label>
+          <select class="status-select" id="sel-${o.id}">
+            <option value="pending"        ${o.status==='pending'        ?'selected':''}>⏳ 待付款</option>
+            <option value="paid"           ${o.status==='paid'           ?'selected':''}>✅ 已付款</option>
+            <option value="shipping"       ${o.status==='shipping'       ?'selected':''}>🚚 出貨中</option>
+            <option value="delivered"      ${o.status==='delivered'      ?'selected':''}>📦 已送達</option>
+            <option value="payment_failed" ${o.status==='payment_failed' ?'selected':''}>❌ 付款失敗</option>
+          </select>
+          <button class="btn-update-status" id="updbtn-${o.id}" onclick="updateOrderStatus('${o.id}')">儲存</button>
+          <button onclick="copyOrderInfo('${o.id}')" style="padding:10px 16px;background:var(--cream-dark);color:var(--wood-dark);border:2px solid var(--border-warm);border-radius:8px;cursor:pointer;font-size:15px;font-family:'Noto Sans TC',sans-serif;font-weight:700;">📋 複製資料</button>
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div class="admin-no-orders">❌ 載入失敗：${esc(e.message)}</div>`;
+    toast('載入訂單失敗：' + e.message);
+  }
+};
+
+// 更新單筆訂單狀態
+window.updateOrderStatus = async function(orderId) {
+  const sel = $('sel-' + orderId);
+  const btn = $('updbtn-' + orderId);
+  if (!sel) return;
+  const newStatus = sel.value;
+  btn.textContent = '⏳'; btn.disabled = true;
+  try {
+    await updateDoc(doc(db,'orders',orderId), {
+      status: newStatus,
+      updatedAt: serverTimestamp(),
+    });
+    toast('✅ 訂單 ' + orderId + ' 已更新為：' + STATUS_MAP[newStatus]?.l);
+    // 更新卡片上的 badge，不需要重新整理整頁
+    const card = btn.closest('.admin-order-card');
+    const badge = card.querySelector('.status-badge');
+    const st = STATUS_MAP[newStatus];
+    badge.textContent = st.l;
+    badge.className = 'status-badge ' + st.c;
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = '儲存'; btn.disabled = false; }, 1500);
+  } catch(e) {
+    toast('❌ 更新失敗：' + e.message);
+    btn.textContent = '儲存'; btn.disabled = false;
+  }
+};
+
+// 複製訂單資料到剪貼簿（方便填寫物流單）
+window.copyOrderInfo = async function(orderId) {
+  try {
+    const d = await getDoc(doc(db,'orders',orderId));
+    if (!d.exists()) return;
+    const o = d.data();
+    const text = [
+      '訂單編號：' + orderId,
+      '商品：'     + (o.product||'-') + ' × ' + (o.qty||1),
+      '金額：NT$'  + Number(o.total||0).toLocaleString(),
+      '收件人：'   + (o.name||'-'),
+      '手機：'     + (o.phone||'-'),
+      '地址：'     + (o.addr||'-'),
+      o.email ? 'Email：' + o.email : '',
+      o.note  ? '備註：'  + o.note  : '',
+    ].filter(Boolean).join('\n');
+    await navigator.clipboard.writeText(text);
+    toast('✅ 已複製訂單資料');
+  } catch(e) {
+    toast('複製失敗，請手動複製');
+  }
 };
 
 /* ── 啟動 ─────────────────────────────────────────── */
