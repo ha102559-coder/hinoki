@@ -530,12 +530,16 @@ document.querySelectorAll('.modal-overlay').forEach(o=>
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
 
 /* ── Auth ────────────────────────────────────────── */
+// 頁面一開就先載商品，不等 Auth
+loadProducts();
+
 onAuthStateChanged(auth, user=>{
   isAdmin = !!(user && user.email===ADMIN);
   $('adminBar').classList.toggle('show', isAdmin);
   $('adminLoginBtn').textContent = isAdmin ? '✅ 已登入' : '🔑 管理';
   $('adminLoginBtn').style.background = isAdmin ? 'rgba(46,125,50,0.5)' : '';
-  loadProducts();
+  // Auth 確認後重新 render，讓管理員的下架按鈕等功能正確顯示
+  renderProducts();
 });
 
 window.clickAdmin = ()=>{ if(isAdmin){toast('您已在管理員模式');}else{openModal('loginModal');} };
