@@ -7,7 +7,6 @@
 <title>台灣紅檜 · 天然精油</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"></noscript>
 <style>
@@ -211,7 +210,6 @@
   .admin-no-orders{text-align:center;padding:60px;color:#aaa;font-size:18px;}
 
 </style>
-<!-- Firebase module preload hints -->
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js">
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js">
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js">
@@ -266,7 +264,7 @@
   <div class="section-title"><h2>精選商品</h2><p>純天然台灣紅檜精油系列，嚴選高品質，保證正品</p></div>
   <div class="products-section">
     <div class="product-grid" id="productGrid">
-      <div class="product-card" style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;"></div><div class="product-card" style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;"></div><div class="product-card" style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;"></div><div class="product-card" style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;"></div>
+      <div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div>
     </div>
   </div>
 </div>
@@ -480,10 +478,15 @@
 
 <!-- Firebase (ES Module via type=module) -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
-import { initializeApp }          from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, query, orderBy, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
+         deleteDoc, onSnapshot, query, orderBy, updateDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 
 /* ── 初始化 ─────────────────────────────────────── */
 const app = initializeApp({
@@ -539,7 +542,7 @@ onAuthStateChanged(auth, user=>{
   $('adminBar').classList.toggle('show', isAdmin);
   $('adminLoginBtn').textContent = isAdmin ? '✅ 已登入' : '🔑 管理';
   $('adminLoginBtn').style.background = isAdmin ? 'rgba(46,125,50,0.5)' : '';
-  loadProducts(); // auth state fires once on load
+  loadProducts();
 });
 
 window.clickAdmin = ()=>{ if(isAdmin){toast('您已在管理員模式');}else{openModal('loginModal');} };
@@ -856,15 +859,19 @@ window.saveIntro=async()=>{
   if(!text){toast('⚠️ 請填寫介紹內容');return;}
   if(!isAdmin){toast('⚠️ 請先登入管理員');return;}
   const btn=document.querySelector('#introModal .btn-save');
-  btn.textContent='⏳ 儲存中...'; btn.disabled=true;
+  const orig=btn.textContent; btn.textContent='⏳ 儲存中...'; btn.disabled=true;
   try{
     await setDoc(doc(db,'settings','intro'),{text,updatedAt:serverTimestamp()});
     closeModal('introModal'); showIntro(text); toast('✅ 自我介紹已儲存');
   }catch(e){
-    console.error('saveIntro error:', e);
-    toast('❌ 儲存失敗：'+e.message);
+    console.error('[saveIntro]', e.code, e.message);
+    if(e.code==='permission-denied'){
+      toast('❌ 權限不足：請確認 Firebase Rules 已允許 settings collection 寫入');
+    } else {
+      toast('❌ 儲存失敗：'+e.message);
+    }
   }finally{
-    btn.textContent='💾 儲存自我介紹'; btn.disabled=false;
+    btn.textContent=orig; btn.disabled=false;
   }
 };
 
@@ -998,8 +1005,8 @@ window.copyOrderInfo = async function(orderId) {
 };
 
 /* ── 啟動 ─────────────────────────────────────────── */
-// loadIntro and initial product skeleton run immediately; loadProducts triggered by onAuthStateChanged
 loadIntro();
+// loadProducts 由 onAuthStateChanged 觸發
 </script>
 </body>
 </html>
