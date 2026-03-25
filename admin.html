@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理後台 · 台灣紅檜精油</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wood-dark:#3d1f0a; --wood-mid:#7a3e14; --wood-warm:#b5621e; --wood-light:#d4894a;
+  --cream:#fdf6ec; --cream-dark:#f0e4cf;
+  --green-deep:#2d5a27; --green-mid:#4a7c3f;
+  --gold:#c8922a; --red-taiwan:#c0392b;
+  --text-dark:#1a0d05; --text-mid:#4a2c10; --border-warm:#c4894a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans TC',sans-serif;font-size:16px;background:#f5f5f5;color:var(--text-dark);}
+
+/* ── LOGIN ── */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--wood-dark),var(--wood-mid));}
+.login-box{background:var(--cream);border-radius:20px;padding:48px 40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);border:3px solid var(--gold);}
+.login-box .logo{font-family:'Noto Serif TC',serif;font-size:28px;font-weight:900;color:var(--wood-dark);letter-spacing:3px;margin-bottom:8px;}
+.login-box .sub{font-size:14px;color:#888;margin-bottom:32px;letter-spacing:1px;}
+.btn-google{width:100%;padding:16px;background:#fff;border:2px solid #ddd;border-radius:12px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Noto Sans TC',sans-serif;font-weight:700;color:#333;transition:all .2s;}
+.btn-google:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(200,146,42,.2);}
+.back-link{display:inline-block;margin-top:20px;font-size:14px;color:var(--wood-warm);text-decoration:none;cursor:pointer;}
+.back-link:hover{text-decoration:underline;}
+
+/* ── LAYOUT ── */
+#adminApp{display:none;min-height:100vh;}
+.admin-header{background:linear-gradient(135deg,var(--wood-dark),var(--wood-mid));padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.admin-header .logo{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:var(--cream);letter-spacing:2px;}
+.admin-header .user{font-size:14px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:16px;}
+.btn-logout{padding:8px 16px;background:rgba(192,57,43,.4);color:#fff;border:1px solid var(--red-taiwan);border-radius:6px;cursor:pointer;font-size:14px;font-family:'Noto Sans TC',sans-serif;font-weight:700;transition:all .2s;}
+.btn-logout:hover{background:var(--red-taiwan);}
+
+.admin-nav{background:var(--wood-dark);display:flex;gap:4px;padding:0 16px;border-bottom:3px solid var(--gold);}
+.admin-nav button{padding:14px 22px;background:none;border:none;color:rgba(255,255,255,.6);font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;letter-spacing:1px;}
+.admin-nav button:hover{color:#fff;}
+.admin-nav button.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.admin-content{max-width:1200px;margin:0 auto;padding:32px 20px 60px;}
+
+/* ── TABS ── */
+.tab{display:none;} .tab.active{display:block;}
+
+/* ── CARDS ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.section-head h2{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:var(--wood-dark);}
+.btn-primary{padding:12px 24px;background:linear-gradient(135deg,var(--green-deep),var(--green-mid));color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.btn-danger{padding:12px 24px;background:var(--red-taiwan);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-danger:hover{opacity:.9;}
+.btn-secondary{padding:10px 20px;background:var(--cream-dark);color:var(--wood-dark);border:2px solid var(--border-warm);border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-secondary:hover{background:var(--border-warm);color:#fff;}
+
+/* ── PRODUCT GRID ── */
+.product-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+.product-admin-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(61,31,10,.1);border:2px solid var(--cream-dark);transition:all .2s;}
+.product-admin-card:hover{border-color:var(--border-warm);box-shadow:0 4px 20px rgba(61,31,10,.15);}
+.pac-img{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--cream-dark),#e8f0e4);display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;position:relative;}
+.pac-img img{width:100%;height:100%;object-fit:cover;}
+.pac-tag{position:absolute;top:8px;left:8px;background:var(--red-taiwan);color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.pac-body{padding:16px;}
+.pac-name{font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;color:var(--wood-dark);margin-bottom:4px;}
+.pac-price{font-size:20px;font-weight:900;color:var(--red-taiwan);margin-bottom:12px;}
+.pac-actions{display:flex;gap:8px;}
+.pac-actions button{flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;transition:all .2s;}
+.btn-edit{background:var(--gold);color:#fff;}
+.btn-edit:hover{background:var(--wood-warm);}
+.btn-del{background:#fee;color:var(--red-taiwan);border:1px solid #fcc !important;}
+.btn-del:hover{background:var(--red-taiwan);color:#fff;}
+
+.empty-slot{border:3px dashed var(--border-warm);background:rgba(200,146,42,.03);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;cursor:pointer;color:var(--wood-warm);font-size:15px;font-weight:700;gap:8px;transition:all .2s;}
+.empty-slot:hover{background:rgba(200,146,42,.08);border-color:var(--gold);}
+.empty-slot .plus{font-size:40px;color:var(--gold);}
+
+/* ── FORM ── */
+.form-panel{background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(61,31,10,.08);border:2px solid var(--cream-dark);}
+.form-panel h3{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:var(--wood-dark);margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--cream-dark);}
+.form-row{margin-bottom:18px;}
+.form-row label{display:block;font-size:15px;font-weight:700;color:var(--wood-dark);margin-bottom:6px;}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:12px 14px;font-size:15px;border:2px solid var(--cream-dark);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--text-dark);background:#fff;transition:border-color .2s;}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,146,42,.12);}
+.img-upload{border:3px dashed var(--border-warm);border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:rgba(200,146,42,.03);color:var(--wood-warm);transition:all .2s;position:relative;}
+.img-upload:hover{background:rgba(200,146,42,.08);}
+.img-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.img-upload-prev{max-width:100%;max-height:180px;border-radius:8px;margin-top:10px;display:none;}
+.form-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;}
+.form-actions button{flex:1;min-width:140px;padding:14px;font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;font-family:'Noto Serif TC',serif;letter-spacing:1px;border:none;transition:all .2s;}
+.btn-save{background:linear-gradient(135deg,var(--green-deep),var(--green-mid));color:#fff;}
+.btn-save:disabled{opacity:.6;cursor:not-allowed;}
+.btn-cancel{background:var(--cream-dark);color:var(--wood-dark);border:2px solid var(--border-warm) !important;}
+.btn-delete{background:#fff;color:var(--red-taiwan);border:2px solid var(--red-taiwan) !important;}
+.btn-delete:hover{background:var(--red-taiwan);color:#fff;}
+
+/* ── ORDERS ── */
+.orders-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.orders-filter select{padding:10px 14px;font-size:15px;border:2px solid var(--cream-dark);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--text-dark);background:#fff;cursor:pointer;}
+.order-card{background:#fff;border:2px solid var(--cream-dark);border-radius:12px;padding:20px;margin-bottom:14px;transition:border-color .2s;}
+.order-card:hover{border-color:var(--border-warm);}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.order-id{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:900;color:var(--wood-dark);}
+.order-time{font-size:13px;color:#aaa;margin-top:2px;}
+.order-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px 16px;margin-bottom:14px;}
+.order-field .k{font-size:12px;color:#aaa;margin-bottom:2px;}
+.order-field .v{font-size:15px;font-weight:700;color:var(--text-dark);word-break:break-all;}
+.order-field .v.price{color:var(--red-taiwan);font-size:18px;}
+.order-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:2px dashed var(--cream-dark);padding-top:12px;}
+.status-select{padding:8px 12px;font-size:14px;border:2px solid var(--border-warm);border-radius:6px;font-family:'Noto Sans TC',sans-serif;color:var(--wood-dark);background:var(--cream);cursor:pointer;font-weight:700;}
+.btn-status-save{padding:8px 18px;background:var(--green-deep);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-status-save:disabled{opacity:.5;cursor:not-allowed;}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;}
+.s-paid{background:#d4edda;color:#155724;}.s-shipping{background:#fff3cd;color:#856404;}.s-delivered{background:#cce5ff;color:#004085;}.s-pending{background:#fff3cd;color:#856404;}.s-failed{background:#f8d7da;color:#721c24;}
+
+/* ── MESSAGES ── */
+.msg-card{background:#fff;border:2px solid var(--cream-dark);border-radius:12px;padding:18px;margin-bottom:12px;}
+.msg-header{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:#888;}
+.msg-phone{font-weight:700;color:var(--wood-mid);font-size:15px;}
+.msg-text{font-size:16px;color:var(--text-dark);line-height:1.7;margin-bottom:10px;}
+.reply-item{background:#fff9f0;border:1px solid var(--cream-dark);border-radius:8px;padding:12px;margin-top:8px;}
+.reply-meta{font-size:12px;color:#aaa;margin-bottom:4px;}
+.reply-text{font-size:15px;color:var(--text-dark);}
+.reply-form{display:flex;gap:8px;margin-top:10px;}
+.reply-form input{flex:1;padding:10px 12px;font-size:15px;border:2px solid var(--cream-dark);border-radius:6px;font-family:'Noto Sans TC',sans-serif;}
+.reply-form input:focus{outline:none;border-color:var(--gold);}
+.reply-form button{padding:10px 18px;background:var(--wood-warm);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
+
+/* ── INTRO ── */
+.intro-panel{background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(61,31,10,.08);border:2px solid var(--cream-dark);max-width:720px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--wood-dark);color:#fff;padding:14px 24px;border-radius:10px;font-size:16px;font-weight:700;z-index:9999;border:2px solid var(--gold);box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── NO DATA ── */
+.no-data{text-align:center;padding:60px;color:#aaa;font-size:17px;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- 登入畫面 -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo">🌲 台灣紅檜精油</div>
+    <div class="sub">管理員後台 · Admin Panel</div>
+    <button class="btn-google" onclick="doLogin()">
+      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      使用 Google 帳號登入
+    </button>
+    <a class="back-link" href="index.html">← 回到前台</a>
+  </div>
+</div>
+
+<!-- 管理後台主體 -->
+<div id="adminApp">
+  <header class="admin-header">
+    <div class="logo">🌲 台灣紅檜精油 · 管理後台</div>
+    <div class="user">
+      <span id="adminEmail"></span>
+      <button class="btn-logout" onclick="doLogout()">登出</button>
+    </div>
+  </header>
+
+  <nav class="admin-nav">
+    <button class="active" onclick="switchTab('products')">🌿 商品管理</button>
+    <button onclick="switchTab('orders')">📋 訂單管理</button>
+    <button onclick="switchTab('messages')">💬 留言管理</button>
+    <button onclick="switchTab('intro')">✏️ 自我介紹</button>
+  </nav>
+
+  <div class="admin-content">
+
+    <!-- ── 商品管理 ── -->
+    <div class="tab active" id="tab-products">
+      <div class="section-head">
+        <h2>🌿 商品管理</h2>
+        <button class="btn-primary" onclick="openAddForm(-1)">＋ 上架新商品</button>
+      </div>
+
+      <!-- 商品列表 -->
+      <div id="productList" style="margin-bottom:32px;">
+        <div class="no-data">⏳ 載入中...</div>
+      </div>
+
+      <!-- 新增/編輯表單 -->
+      <div class="form-panel" id="productForm" style="display:none;">
+        <h3 id="formTitle">上架新商品</h3>
+        <div class="form-row">
+          <label>商品名稱 *</label>
+          <input type="text" id="fName" placeholder="例：台灣紅檜精油 10ml">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-row">
+            <label>售價（新台幣）*</label>
+            <input type="number" id="fPrice" placeholder="例：680">
+          </div>
+          <div class="form-row">
+            <label>標籤（選填）</label>
+            <input type="text" id="fTag" placeholder="例：熱銷、新品">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>商品簡介（卡片顯示）</label>
+          <textarea id="fShort" placeholder="40字以內的短描述..." style="min-height:70px;resize:vertical;"></textarea>
+        </div>
+        <div class="form-row">
+          <label>詳細描述</label>
+          <textarea id="fLong" placeholder="容量、使用方式、注意事項等..." style="min-height:120px;resize:vertical;"></textarea>
+        </div>
+        <div class="form-row">
+          <label>商品圖片</label>
+          <div class="img-upload" id="imgUploadArea">
+            <div id="imgUploadLabel">📷 點此上傳商品圖片（JPG / PNG，建議正方形）</div>
+            <input type="file" id="fImg" accept="image/*" onchange="previewFormImg(this)">
+            <img class="img-upload-prev" id="fImgPrev">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="form-actions btn-save" id="btnFormSave" onclick="saveProduct()">✅ 儲存上架</button>
+          <button class="form-actions btn-cancel" onclick="closeForm()">取消</button>
+          <button class="form-actions btn-delete" id="btnFormDelete" style="display:none;" onclick="deleteProduct()">🗑️ 下架刪除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 訂單管理 ── -->
+    <div class="tab" id="tab-orders">
+      <div class="section-head">
+        <h2>📋 訂單管理</h2>
+        <span id="orderCount" style="font-size:14px;color:#888;"></span>
+      </div>
+      <div class="orders-filter">
+        <select id="orderFilter" onchange="loadOrders()">
+          <option value="">全部訂單</option>
+          <option value="pending">⏳ 待付款</option>
+          <option value="paid">✅ 已付款</option>
+          <option value="shipping">🚚 出貨中</option>
+          <option value="delivered">📦 已送達</option>
+          <option value="payment_failed">❌ 付款失敗</option>
+        </select>
+        <button class="btn-secondary" onclick="loadOrders()">🔄 重新整理</button>
+      </div>
+      <div id="orderList"><div class="no-data">⏳ 載入中...</div></div>
+    </div>
+
+    <!-- ── 留言管理 ── -->
+    <div class="tab" id="tab-messages">
+      <div class="section-head">
+        <h2>💬 留言管理</h2>
+        <button class="btn-secondary" onclick="loadMessages()">🔄 重新整理</button>
+      </div>
+      <div id="messageList"><div class="no-data">⏳ 載入中...</div></div>
+    </div>
+
+    <!-- ── 自我介紹 ── -->
+    <div class="tab" id="tab-intro">
+      <div class="section-head"><h2>✏️ 自我介紹</h2></div>
+      <div class="intro-panel">
+        <div class="form-row">
+          <label>介紹內容</label>
+          <textarea id="introText" style="min-height:260px;resize:vertical;font-size:16px;" placeholder="填入您的個人故事、品牌理念、製作工法、聯絡電話等..."></textarea>
+        </div>
+        <button class="btn-primary" id="btnSaveIntro" onclick="saveIntro()" style="width:100%;padding:14px;font-size:17px;margin-top:4px;">💾 儲存自我介紹</button>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /adminApp -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
+         deleteDoc, query, orderBy, updateDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
+
+/* ── 初始化 ── */
+const app = initializeApp({
+  apiKey: "AIzaSyBYKtAPD0pin5B-1ctXIOj6CE1AO_VfHaE",
+  authDomain: "hinoki-17ffe.firebaseapp.com",
+  projectId: "hinoki-17ffe",
+  storageBucket: "hinoki-17ffe.firebasestorage.app",
+  messagingSenderId: "894705167512",
+  appId: "1:894705167512:web:f4cee2ee1d1fe6a75cf4ed"
+});
+const auth     = getAuth(app);
+const db       = getFirestore(app);
+const storage  = getStorage(app);
+const provider = new GoogleAuthProvider();
+
+const ADMIN = "enzdwllg@gmail.com";
+const SLOTS = 12;
+
+let products = [];
+let editingId = null;
+let editingSlot = -1;
+let imgFile = null;
+
+const $ = id => document.getElementById(id);
+
+/* ── Toast ── */
+function toast(msg, ms=2800){
+  const el=$('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),ms);
+}
+function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function mask(p=''){return p.length>=7?p.slice(0,4)+'****'+p.slice(-3):p;}
+
+/* ── Auth ── */
+onAuthStateChanged(auth, user => {
+  if(user && user.email === ADMIN){
+    $('loginScreen').style.display = 'none';
+    $('adminApp').style.display = 'block';
+    $('adminEmail').textContent = user.email;
+    loadProducts();
+    loadIntro();
+  } else {
+    $('loginScreen').style.display = 'flex';
+    $('adminApp').style.display = 'none';
+  }
+});
+
+window.doLogin = async () => {
+  try{
+    const res = await signInWithPopup(auth, provider);
+    if(res.user.email !== ADMIN){
+      await signOut(auth);
+      toast('⚠️ 此帳號無管理權限');
+    }
+  } catch(e){ toast('登入失敗：' + e.message); }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  toast('已登出');
+};
+
+/* ── Tab 切換 ── */
+window.switchTab = id => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-nav button').forEach(b => b.classList.remove('active'));
+  $('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if(id === 'orders')   loadOrders();
+  if(id === 'messages') loadMessages();
+};
+
+/* ════════════════════════════════
+   商品管理
+════════════════════════════════ */
+async function loadProducts(){
+  $('productList').innerHTML = '<div class="no-data">⏳ 載入中...</div>';
+  products = Array.from({length:SLOTS}, (_,i) => ({slot:i, empty:true}));
+  try{
+    const snap = await getDocs(query(collection(db,'products'), orderBy('slot')));
+    snap.forEach(d => {
+      const data = d.data(), idx = data.slot ?? 0;
+      if(idx < SLOTS) products[idx] = {id:d.id, ...data, empty:false};
+    });
+  } catch(e){ toast('❌ 載入商品失敗：' + e.message); }
+  renderProducts();
+}
+
+function renderProducts(){
+  const list = $('productList');
+  const filled = products.filter(p => !p.empty);
+
+  if(!filled.length){
+    list.innerHTML = '<div class="no-data">目前還沒有商品，點上方「上架新商品」開始新增</div>';
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'product-admin-grid';
+
+  products.forEach((p, i) => {
+    const card = document.createElement('div');
+    if(p.empty){
+      card.className = 'empty-slot';
+      card.innerHTML = `<div class="plus">＋</div><div>槽位 ${i+1}（空）</div>`;
+      card.onclick = () => openAddForm(i);
+    } else {
+      card.className = 'product-admin-card';
+      card.innerHTML = `
+        <div class="pac-img">
+          ${p.img ? `<img src="${p.img}" alt="${esc(p.name)}">` : '🌲'}
+          ${p.tag ? `<div class="pac-tag">${esc(p.tag)}</div>` : ''}
+        </div>
+        <div class="pac-body">
+          <div class="pac-name">${esc(p.name)}</div>
+          <div class="pac-price">NT$${Number(p.price).toLocaleString()}</div>
+          <div class="pac-actions">
+            <button class="btn-edit" onclick="openEditForm('${p.id}')">✏️ 編輯</button>
+            <button class="btn-del" onclick="confirmDelete('${p.id}', '${esc(p.name)}')">🗑️ 下架</button>
+          </div>
+        </div>`;
+    }
+    grid.appendChild(card);
+  });
+  list.innerHTML = '';
+  list.appendChild(grid);
+}
+
+window.openAddForm = (slot) => {
+  editingId = null;
+  editingSlot = slot;
+  imgFile = null;
+  $('formTitle').textContent = '上架新商品';
+  ['fName','fPrice','fTag','fShort','fLong'].forEach(id => $(id).value = '');
+  $('fImgPrev').style.display = 'none';
+  $('fImg').value = '';
+  $('imgUploadLabel').textContent = '📷 點此上傳商品圖片（JPG / PNG，建議正方形）';
+  $('btnFormSave').textContent = '✅ 儲存上架';
+  $('btnFormDelete').style.display = 'none';
+  $('productForm').style.display = 'block';
+  $('productForm').scrollIntoView({behavior:'smooth', block:'start'});
+};
+
+window.openEditForm = (id) => {
+  const p = products.find(p => p.id === id);
+  if(!p) return;
+  editingId = id;
+  editingSlot = p.slot ?? -1;
+  imgFile = null;
+  $('formTitle').textContent = '編輯商品';
+  $('fName').value  = p.name || '';
+  $('fPrice').value = p.price || '';
+  $('fTag').value   = p.tag || '';
+  $('fShort').value = p.shortDesc || '';
+  $('fLong').value  = p.longDesc || '';
+  if(p.img){
+    $('fImgPrev').src = p.img;
+    $('fImgPrev').style.display = 'block';
+    $('imgUploadLabel').textContent = '✅ 目前圖片（可重新上傳）';
+  } else {
+    $('fImgPrev').style.display = 'none';
+    $('imgUploadLabel').textContent = '📷 點此上傳商品圖片';
+  }
+  $('fImg').value = '';
+  $('btnFormSave').textContent = '💾 儲存修改';
+  $('btnFormDelete').style.display = 'block';
+  $('productForm').style.display = 'block';
+  $('productForm').scrollIntoView({behavior:'smooth', block:'start'});
+};
+
+window.closeForm = () => {
+  $('productForm').style.display = 'none';
+  editingId = null; imgFile = null;
+};
+
+window.previewFormImg = input => {
+  const file = input.files[0]; if(!file) return;
+  imgFile = file;
+  const r = new FileReader();
+  r.onload = e => {
+    $('fImgPrev').src = e.target.result;
+    $('fImgPrev').style.display = 'block';
+    $('imgUploadLabel').textContent = '✅ ' + file.name;
+  };
+  r.readAsDataURL(file);
+};
+
+window.saveProduct = async () => {
+  const name  = $('fName').value.trim();
+  const price = parseInt($('fPrice').value);
+  if(!name || !price){ toast('⚠️ 請填寫商品名稱與售價'); return; }
+
+  const btn = $('btnFormSave');
+  btn.disabled = true;
+
+  try {
+    // 上傳圖片
+    let imgUrl = editingId ? (products.find(p=>p.id===editingId)?.img || null) : null;
+    if(imgFile){
+      btn.textContent = '⏳ 上傳圖片中...';
+      const ref = sRef(storage, `products/${Date.now()}_${imgFile.name}`);
+      const snap = await uploadBytes(ref, imgFile);
+      imgUrl = await getDownloadURL(snap.ref);
+    }
+
+    btn.textContent = '⏳ 儲存中...';
+    const data = {
+      name, price,
+      img:       imgUrl,
+      tag:       $('fTag').value.trim(),
+      shortDesc: $('fShort').value.trim(),
+      longDesc:  $('fLong').value.trim(),
+    };
+
+    if(editingId){
+      await updateDoc(doc(db,'products',editingId), {...data, updatedAt: serverTimestamp()});
+      toast('✅ 商品已更新！');
+    } else {
+      const slot = editingSlot >= 0 ? editingSlot : products.findIndex(p => p.empty);
+      if(slot < 0){ toast('⚠️ 已無空槽（最多12項）'); return; }
+      await addDoc(collection(db,'products'), {...data, slot, createdAt: serverTimestamp()});
+      toast('✅ 商品已上架！');
+    }
+
+    closeForm();
+    await loadProducts();
+  } catch(e){
+    console.error(e);
+    if(e.code === 'storage/unauthorized') toast('❌ 圖片上傳失敗：請確認 Storage 規則');
+    else if(e.code === 'permission-denied') toast('❌ 權限不足：請確認 Firestore 規則');
+    else toast('❌ 失敗：' + e.message);
+  } finally {
+    btn.textContent = editingId ? '💾 儲存修改' : '✅ 儲存上架';
+    btn.disabled = false;
+  }
+};
+
+window.confirmDelete = async (id, name) => {
+  if(!confirm(`確定要下架「${name}」嗎？`)) return;
+  try{
+    await deleteDoc(doc(db,'products',id));
+    toast('✅ 已下架');
+    await loadProducts();
+  } catch(e){ toast('❌ 下架失敗：' + e.message); }
+};
+
+window.deleteProduct = async () => {
+  if(!editingId) return;
+  const p = products.find(p => p.id === editingId);
+  if(!confirm(`確定要下架「${p?.name}」嗎？`)) return;
+  try{
+    await deleteDoc(doc(db,'products',editingId));
+    toast('✅ 已下架');
+    closeForm();
+    await loadProducts();
+  } catch(e){ toast('❌ 失敗：' + e.message); }
+};
+
+/* ════════════════════════════════
+   訂單管理
+════════════════════════════════ */
+const STATUS_MAP = {
+  pending:        {l:'⏳ 待付款',   c:'s-pending'},
+  paid:           {l:'✅ 已付款',   c:'s-paid'},
+  shipping:       {l:'🚚 出貨中',   c:'s-shipping'},
+  delivered:      {l:'📦 已送達',   c:'s-delivered'},
+  payment_failed: {l:'❌ 付款失敗', c:'s-failed'},
+};
+
+window.loadOrders = async () => {
+  const list = $('orderList');
+  list.innerHTML = '<div class="no-data">⏳ 載入中...</div>';
+  try{
+    const filter = $('orderFilter').value;
+    const snap = await getDocs(query(collection(db,'orders'), orderBy('createdAt','desc')));
+    let orders = [];
+    snap.forEach(d => orders.push({id:d.id, ...d.data()}));
+    if(filter) orders = orders.filter(o => o.status === filter);
+    $('orderCount').textContent = `共 ${orders.length} 筆`;
+    if(!orders.length){ list.innerHTML = '<div class="no-data">📭 沒有符合的訂單</div>'; return; }
+
+    list.innerHTML = orders.map(o => {
+      const ts = o.createdAt?.toDate?.();
+      const t  = ts ? ts.toLocaleString('zh-TW') : '-';
+      const st = STATUS_MAP[o.status] || STATUS_MAP.pending;
+      const amt = 'NT$' + Number(o.total||0).toLocaleString();
+      return `<div class="order-card">
+        <div class="order-top">
+          <div>
+            <div class="order-id">${esc(o.id)}</div>
+            <div class="order-time">${t}</div>
+          </div>
+          <span class="status-badge ${st.c}">${st.l}</span>
+        </div>
+        <div class="order-fields">
+          <div class="order-field"><div class="k">商品</div><div class="v">${esc(o.product||'-')}</div></div>
+          <div class="order-field"><div class="k">數量</div><div class="v">${o.qty||1} 瓶</div></div>
+          <div class="order-field"><div class="k">金額</div><div class="v price">${amt}</div></div>
+          <div class="order-field"><div class="k">收件人</div><div class="v">${esc(o.name||'-')}</div></div>
+          <div class="order-field"><div class="k">手機</div><div class="v">${esc(o.phone||'-')}</div></div>
+          <div class="order-field"><div class="k">地址</div><div class="v">${esc(o.addr||'-')}</div></div>
+          ${o.email ? `<div class="order-field"><div class="k">Email</div><div class="v">${esc(o.email)}</div></div>` : ''}
+          ${o.note  ? `<div class="order-field"><div class="k">備註</div><div class="v">${esc(o.note)}</div></div>`  : ''}
+        </div>
+        <div class="order-actions">
+          <label style="font-size:14px;font-weight:700;color:var(--wood-dark);white-space:nowrap;">更新狀態：</label>
+          <select class="status-select" id="sel-${o.id}">
+            <option value="pending"        ${o.status==='pending'        ?'selected':''}>⏳ 待付款</option>
+            <option value="paid"           ${o.status==='paid'           ?'selected':''}>✅ 已付款</option>
+            <option value="shipping"       ${o.status==='shipping'       ?'selected':''}>🚚 出貨中</option>
+            <option value="delivered"      ${o.status==='delivered'      ?'selected':''}>📦 已送達</option>
+            <option value="payment_failed" ${o.status==='payment_failed' ?'selected':''}>❌ 付款失敗</option>
+          </select>
+          <button class="btn-status-save" id="upd-${o.id}" onclick="updateStatus('${o.id}')">儲存</button>
+          <button class="btn-secondary" onclick="copyOrder('${o.id}')">📋 複製資料</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div class="no-data">❌ 載入失敗：${esc(e.message)}</div>`;
+  }
+};
+
+window.updateStatus = async (orderId) => {
+  const sel = $('sel-' + orderId);
+  const btn = $('upd-' + orderId);
+  const newStatus = sel.value;
+  btn.textContent = '⏳'; btn.disabled = true;
+  try{
+    await updateDoc(doc(db,'orders',orderId), {status:newStatus, updatedAt:serverTimestamp()});
+    toast('✅ 已更新為：' + STATUS_MAP[newStatus]?.l);
+    const card  = btn.closest('.order-card');
+    const badge = card.querySelector('.status-badge');
+    const st    = STATUS_MAP[newStatus];
+    badge.textContent = st.l; badge.className = 'status-badge ' + st.c;
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = '儲存'; btn.disabled = false; }, 1500);
+  } catch(e){ toast('❌ 更新失敗：' + e.message); btn.textContent = '儲存'; btn.disabled = false; }
+};
+
+window.copyOrder = async (orderId) => {
+  try{
+    const d = await getDoc(doc(db,'orders',orderId));
+    if(!d.exists()) return;
+    const o = d.data();
+    const text = [
+      '訂單編號：' + orderId,
+      '商品：' + (o.product||'-') + ' × ' + (o.qty||1),
+      '金額：NT$' + Number(o.total||0).toLocaleString(),
+      '收件人：' + (o.name||'-'),
+      '手機：' + (o.phone||'-'),
+      '地址：' + (o.addr||'-'),
+      o.email ? 'Email：' + o.email : '',
+      o.note  ? '備註：'  + o.note  : '',
+    ].filter(Boolean).join('\n');
+    await navigator.clipboard.writeText(text);
+    toast('✅ 已複製訂單資料');
+  } catch(e){ toast('複製失敗，請手動複製'); }
+};
+
+/* ════════════════════════════════
+   留言管理
+════════════════════════════════ */
+window.loadMessages = async () => {
+  const list = $('messageList');
+  list.innerHTML = '<div class="no-data">⏳ 載入中...</div>';
+  try{
+    const snap = await getDocs(query(collection(db,'messages'), orderBy('createdAt','desc')));
+    if(snap.empty){ list.innerHTML = '<div class="no-data">📭 目前沒有留言</div>'; return; }
+    const msgs = [];
+    snap.forEach(d => msgs.push({id:d.id, ...d.data()}));
+    list.innerHTML = msgs.map(m => {
+      const ts = m.createdAt?.toDate?.();
+      const t  = ts ? ts.toLocaleString('zh-TW') : '';
+      const reps = m.replies || [];
+      return `<div class="msg-card">
+        <div class="msg-header">
+          <span class="msg-phone">${mask(m.phone||'')}</span>
+          <span>${t}</span>
+        </div>
+        <div class="msg-text">${esc(m.content||'')}</div>
+        ${reps.map(r=>`
+          <div class="reply-item">
+            <div class="reply-meta">${r.type==='owner'?'🌿 店主回覆':'💬 買家追問'} · ${r.at||''}</div>
+            <div class="reply-text">${esc(r.text||'')}</div>
+          </div>`).join('')}
+        <div class="reply-form">
+          <input type="text" id="ri-${m.id}" placeholder="輸入回覆內容...">
+          <button onclick="replyMsg('${m.id}')">↩️ 回覆</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ list.innerHTML = `<div class="no-data">❌ 載入失敗：${esc(e.message)}</div>`; }
+};
+
+window.replyMsg = async (msgId) => {
+  const inp  = $('ri-' + msgId);
+  const text = inp?.value.trim();
+  if(!text) return;
+  try{
+    const ref  = doc(db,'messages',msgId);
+    const snap = await getDoc(ref);
+    if(!snap.exists()) return;
+    const reps = snap.data().replies || [];
+    reps.push({text, at:new Date().toLocaleString('zh-TW'), type:'owner'});
+    await updateDoc(ref, {replies:reps});
+    inp.value = '';
+    toast('✅ 回覆已送出');
+    await loadMessages();
+  } catch(e){ toast('❌ 回覆失敗：' + e.message); }
+};
+
+/* ════════════════════════════════
+   自我介紹
+════════════════════════════════ */
+async function loadIntro(){
+  try{
+    const d = await getDoc(doc(db,'settings','intro'));
+    if(d.exists() && d.data().text) $('introText').value = d.data().text;
+  } catch(e){}
+}
+
+window.saveIntro = async () => {
+  const text = $('introText').value.trim();
+  if(!text){ toast('⚠️ 請填寫介紹內容'); return; }
+  const btn = $('btnSaveIntro');
+  btn.textContent = '⏳ 儲存中...'; btn.disabled = true;
+  try{
+    await setDoc(doc(db,'settings','intro'), {text, updatedAt:serverTimestamp()});
+    toast('✅ 自我介紹已儲存');
+  } catch(e){
+    if(e.code==='permission-denied') toast('❌ 權限不足：請確認 Firestore 規則');
+    else toast('❌ 儲存失敗：' + e.message);
+  } finally {
+    btn.textContent = '💾 儲存自我介紹'; btn.disabled = false;
+  }
+};
+</script>
+</body>
+</html>
