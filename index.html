@@ -6,9 +6,7 @@
 <meta name="keywords" content="精油,純精油,天然精油,樟腦油,檜木油,紅檜,黃檜,薄荷油,香樟,台灣,降真香,艾草,沉香油">
 <title>台灣紅檜 · 天然精油</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --wood-dark:#3d1f0a; --wood-mid:#7a3e14; --wood-warm:#b5621e; --wood-light:#d4894a;
@@ -189,7 +187,6 @@
   .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--wood-dark);color:#fff;padding:16px 28px;border-radius:12px;font-size:18px;font-weight:700;z-index:9999;border:2px solid var(--gold);box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .3s;white-space:nowrap;}
   .toast.show{transform:translateX(-50%) translateY(0);}
 
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
   @media(max-width:640px){.logo-text .main-title{font-size:20px;}nav a{font-size:15px;padding:8px 14px;}.product-grid{grid-template-columns:1fr 1fr;gap:14px;}.modal-body{padding:18px;}}
   @media(max-width:420px){.product-grid{grid-template-columns:1fr;}.header-top{padding:10px 14px;}}
 
@@ -210,10 +207,6 @@
   .admin-no-orders{text-align:center;padding:60px;color:#aaa;font-size:18px;}
 
 </style>
-<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js">
-<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js">
-<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js">
-<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js">
 </head>
 <body>
 
@@ -264,7 +257,7 @@
   <div class="section-title"><h2>精選商品</h2><p>純天然台灣紅檜精油系列，嚴選高品質，保證正品</p></div>
   <div class="products-section">
     <div class="product-grid" id="productGrid">
-      <div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div><div style="min-height:300px;background:linear-gradient(90deg,#f0e4cf 25%,#fdf6ec 50%,#f0e4cf 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px;border:2px solid #e8d8be;"></div>
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--wood-warm);font-size:18px;">⏳ 連接資料庫中...</div>
     </div>
   </div>
 </div>
@@ -419,7 +412,7 @@
       <div class="add-form">
         <label>自我介紹內容</label>
         <textarea id="introContent" style="min-height:240px;font-size:16px;" placeholder="填入您的個人故事、品牌理念、製作工法、聯絡電話等..."></textarea>
-        <button class="btn-save" onclick="saveIntro()" style="margin-top:16px;">💾 儲存自我介紹</button>
+        <button class="btn-save" id="btnSaveIntro" onclick="saveIntro()" style="margin-top:16px;">💾 儲存自我介紹</button>
       </div>
     </div>
   </div>
@@ -858,20 +851,20 @@ window.saveIntro=async()=>{
   const text=$('introContent').value.trim();
   if(!text){toast('⚠️ 請填寫介紹內容');return;}
   if(!isAdmin){toast('⚠️ 請先登入管理員');return;}
-  const btn=document.querySelector('#introModal .btn-save');
-  const orig=btn.textContent; btn.textContent='⏳ 儲存中...'; btn.disabled=true;
+  const btn=$('btnSaveIntro');
+  btn.textContent='⏳ 儲存中...'; btn.disabled=true;
   try{
     await setDoc(doc(db,'settings','intro'),{text,updatedAt:serverTimestamp()});
     closeModal('introModal'); showIntro(text); toast('✅ 自我介紹已儲存');
   }catch(e){
     console.error('[saveIntro]', e.code, e.message);
     if(e.code==='permission-denied'){
-      toast('❌ 權限不足：請確認 Firebase Rules 已允許 settings collection 寫入');
-    } else {
+      toast('❌ 權限不足：請更新 Firebase Rules');
+    }else{
       toast('❌ 儲存失敗：'+e.message);
     }
   }finally{
-    btn.textContent=orig; btn.disabled=false;
+    btn.textContent='💾 儲存自我介紹'; btn.disabled=false;
   }
 };
 
