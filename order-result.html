@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>付款完成 — 檜木精油本舖</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌲</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .result-page {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .result-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 8px 32px var(--shadow);
+      border: 1px solid var(--cream-dark);
+    }
+    .result-icon { font-size: 5rem; margin-bottom: 1rem; }
+    .result-card h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 0.75rem;
+      letter-spacing: 2px;
+    }
+    .result-card.success h1 { color: var(--green-deep); }
+    .result-card.pending h1 { color: var(--gold); }
+    .result-card.error h1 { color: var(--red-taiwan); }
+    .result-card p { color: var(--ink-mid); line-height: 1.8; margin-bottom: 1.5rem; }
+    .order-info { background: var(--cream); border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0; text-align: left; font-size: 0.88rem; }
+    .order-info .row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid var(--cream-dark); }
+    .order-info .row:last-child { border-bottom: none; }
+    .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+    .c-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-icon">🌲</span>
+      檜木精油本舖
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">首頁</a></li>
+      <li><a href="contact.html">聯絡商家</a></li>
+      <li><a href="privacy.html">隱私政策</a></li>
+    </ul>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</nav>
+
+<div class="result-page">
+  <div class="result-card" id="result-card">
+    <div class="spinner"></div>
+    <p>確認付款狀態中…</p>
+  </div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script src="js/firebase-config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ECPay ClientBackURL → query param 讀取 (如有)
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get('orderId') || '';
+  const rtnCode = params.get('RtnCode') || '';
+
+  // 若直接從 ECPay 跳轉，通常帶 RtnCode 或看 Firestore
+  if (orderId) {
+    initFirebase();
+    checkOrderStatus(orderId);
+  } else {
+    // 可能是從 ECPay redirect 的 ClientBackURL 直接回首頁
+    // 直接顯示感謝頁
+    showResult('pending');
+  }
+});
+
+async function checkOrderStatus(orderId) {
+  try {
+    initFirebase();
+    const doc = await db.collection('orders').doc(orderId).get();
+    if (doc.exists) {
+      const status = doc.data().status;
+      showResult(status, doc.data());
+    } else {
+      showResult('unknown');
+    }
+  } catch {
+    showResult('pending');
+  }
+}
+
+function showResult(status, data) {
+  const card = document.getElementById('result-card');
+  if (status === 'paid') {
+    card.className = 'result-card success';
+    card.innerHTML = `
+      <div class="result-icon">🎉</div>
+      <h1>感謝您的購買！</h1>
+      <p>付款已成功完成，我們將盡快為您安排出貨。<br>通常 2–5 個工作天內到達。</p>
+      ${data ? `<div class="order-info">
+        <div class="row"><span>訂單編號</span><span>${data.orderId}</span></div>
+        <div class="row"><span>購買金額</span><span style="color:var(--red-taiwan);font-weight:700">NT$ ${(data.total||0).toLocaleString('zh-TW')}</span></div>
+        <div class="row"><span>收件人</span><span>${data.buyer?.name||'–'}</span></div>
+        <div class="row"><span>收件地址</span><span style="max-width:200px;text-align:right">${data.buyer?.address||'–'}</span></div>
+      </div>` : ''}
+      <a href="index.html" class="btn btn-green btn-block">回首頁繼續選購</a>`;
+    launchConfetti();
+  } else if (status === 'payment_failed') {
+    card.className = 'result-card error';
+    card.innerHTML = `
+      <div class="result-icon">❌</div>
+      <h1>付款未成功</h1>
+      <p>您的訂單付款發生問題，請重新訂購或聯絡我們確認。</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="index.html" class="btn btn-outline">重新選購</a>
+        <a href="contact.html" class="btn btn-primary">聯絡客服</a>
+      </div>`;
+  } else {
+    // pending or unknown
+    card.className = 'result-card pending';
+    card.innerHTML = `
+      <div class="result-icon">⏳</div>
+      <h1>訂單已建立</h1>
+      <p>感謝您的訂購！若已完成付款，請稍候幾分鐘，系統將自動確認。<br>如有疑問請聯絡我們。</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="index.html" class="btn btn-gold">回首頁</a>
+        <a href="contact.html" class="btn btn-outline">聯絡客服</a>
+      </div>`;
+  }
+}
+
+function launchConfetti() {
+  const colors = ['#c8930a','#4a7a3d','#c0392b','#b07d4a','#7ab06b','#e8b84b'];
+  const c = document.getElementById('confetti');
+  for (let i = 0; i < 60; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'c-dot';
+    dot.style.cssText = `
+      left:${Math.random()*100}vw;
+      top:-20px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-duration:${2+Math.random()*2}s;
+      animation-delay:${Math.random()*1.5}s;`;
+    c.appendChild(dot);
+  }
+  setTimeout(() => c.innerHTML = '', 5000);
+}
+</script>
+</body>
+</html>

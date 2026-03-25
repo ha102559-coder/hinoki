@@ -1,722 +1,860 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>管理後台 · 台灣紅檜精油</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --wood-dark:#3d1f0a; --wood-mid:#7a3e14; --wood-warm:#b5621e; --wood-light:#d4894a;
-  --cream:#fdf6ec; --cream-dark:#f0e4cf;
-  --green-deep:#2d5a27; --green-mid:#4a7c3f;
-  --gold:#c8922a; --red-taiwan:#c0392b;
-  --text-dark:#1a0d05; --text-mid:#4a2c10; --border-warm:#c4894a;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Noto Sans TC',sans-serif;font-size:16px;background:#f5f5f5;color:var(--text-dark);}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>賣家後台 — 檜木精油本舖</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌲</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--cream); }
 
-/* ── LOGIN ── */
-#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--wood-dark),var(--wood-mid));}
-.login-box{background:var(--cream);border-radius:20px;padding:48px 40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);border:3px solid var(--gold);}
-.login-box .logo{font-family:'Noto Serif TC',serif;font-size:28px;font-weight:900;color:var(--wood-dark);letter-spacing:3px;margin-bottom:8px;}
-.login-box .sub{font-size:14px;color:#888;margin-bottom:32px;letter-spacing:1px;}
-.btn-google{width:100%;padding:16px;background:#fff;border:2px solid #ddd;border-radius:12px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Noto Sans TC',sans-serif;font-weight:700;color:#333;transition:all .2s;}
-.btn-google:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(200,146,42,.2);}
-.back-link{display:inline-block;margin-top:20px;font-size:14px;color:var(--wood-warm);text-decoration:none;cursor:pointer;}
-.back-link:hover{text-decoration:underline;}
+    /* ── Login page ── */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, var(--wood-dark) 0%, var(--green-deep) 100%);
+      padding: 2rem;
+    }
+    .login-box {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-logo { font-size: 3.5rem; margin-bottom: 1rem; }
+    .login-box h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--wood-dark);
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+    .login-box p { color: var(--ink-mid); font-size: 0.9rem; margin-bottom: 2rem; }
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      background: var(--white);
+      border: 2px solid var(--cream-dark);
+      border-radius: var(--radius-sm);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .google-btn:hover { border-color: var(--wood-light); box-shadow: 0 4px 16px var(--shadow); }
+    .google-icon { font-size: 1.3rem; }
+    .login-note { margin-top: 1.5rem; font-size: 0.8rem; color: var(--ink-mid); }
 
-/* ── LAYOUT ── */
-#adminApp{display:none;min-height:100vh;}
-.admin-header{background:linear-gradient(135deg,var(--wood-dark),var(--wood-mid));padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.3);}
-.admin-header .logo{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:var(--cream);letter-spacing:2px;}
-.admin-header .user{font-size:14px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:16px;}
-.btn-logout{padding:8px 16px;background:rgba(192,57,43,.4);color:#fff;border:1px solid var(--red-taiwan);border-radius:6px;cursor:pointer;font-size:14px;font-family:'Noto Sans TC',sans-serif;font-weight:700;transition:all .2s;}
-.btn-logout:hover{background:var(--red-taiwan);}
+    /* ── Admin layout ── */
+    .admin-layout { display: none; min-height: 100vh; }
+    .admin-layout.visible { display: flex; }
+    .admin-sidebar {
+      width: 240px;
+      background: var(--wood-dark);
+      background-image: linear-gradient(180deg, var(--wood-dark), #1e0f03);
+      color: var(--cream);
+      padding: 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-logo {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+    }
+    .sidebar-nav { flex: 1; padding: 1rem 0; }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      color: rgba(245,237,216,0.75);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      color: var(--cream);
+      background: rgba(255,255,255,0.08);
+      border-left-color: var(--gold);
+    }
+    .sidebar-nav a .ico { font-size: 1.1rem; }
+    .sidebar-user {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .sidebar-user img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gold); }
+    .sidebar-user-info { flex: 1; min-width: 0; }
+    .sidebar-user-name { font-size: 0.85rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user-role { font-size: 0.72rem; color: var(--gold-light); }
+    .logout-btn { background: none; border: none; color: rgba(245,237,216,0.55); cursor: pointer; font-size: 1rem; padding: 0.2rem; transition: color 0.2s; }
+    .logout-btn:hover { color: var(--red-taiwan); }
 
-.admin-nav{background:var(--wood-dark);display:flex;gap:4px;padding:0 16px;border-bottom:3px solid var(--gold);}
-.admin-nav button{padding:14px 22px;background:none;border:none;color:rgba(255,255,255,.6);font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .2s;letter-spacing:1px;}
-.admin-nav button:hover{color:#fff;}
-.admin-nav button.active{color:var(--gold);border-bottom-color:var(--gold);}
+    /* ── Admin main ── */
+    .admin-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .admin-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--cream-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .admin-topbar h2 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+    }
+    .admin-content { flex: 1; padding: 2rem; overflow-y: auto; }
 
-.admin-content{max-width:1200px;margin:0 auto;padding:32px 20px 60px;}
+    /* ── Panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
 
-/* ── TABS ── */
-.tab{display:none;} .tab.active{display:block;}
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 2px 8px var(--shadow);
+      border-left: 4px solid var(--gold);
+    }
+    .stat-card.green { border-left-color: var(--green-mid); }
+    .stat-card.red { border-left-color: var(--red-taiwan); }
+    .stat-label { font-size: 0.8rem; color: var(--ink-mid); margin-bottom: 0.4rem; font-weight: 600; letter-spacing: 0.5px; }
+    .stat-value { font-family: 'Noto Serif TC', serif; font-size: 1.8rem; font-weight: 900; color: var(--wood-dark); }
 
-/* ── CARDS ── */
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
-.section-head h2{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:var(--wood-dark);}
-.btn-primary{padding:12px 24px;background:linear-gradient(135deg,var(--green-deep),var(--green-mid));color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
-.btn-danger{padding:12px 24px;background:var(--red-taiwan);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-.btn-danger:hover{opacity:.9;}
-.btn-secondary{padding:10px 20px;background:var(--cream-dark);color:var(--wood-dark);border:2px solid var(--border-warm);border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-.btn-secondary:hover{background:var(--border-warm);color:#fff;}
+    /* ── Product table ── */
+    .table-wrap { background: var(--white); border-radius: var(--radius); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
+    .table-toolbar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--cream-dark); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .table-toolbar h3 { font-family: 'Noto Serif TC', serif; font-size: 1rem; font-weight: 700; color: var(--wood-dark); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--cream);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-mid);
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--cream-dark);
+      font-size: 0.9rem;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--cream); }
+    .product-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; background: var(--cream-dark); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; display: inline-block; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: var(--cream-dark); border-radius: 12px; cursor: pointer; transition: 0.3s; }
+    .slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+    .toggle-switch input:checked + .slider { background: var(--green-mid); }
+    .toggle-switch input:checked + .slider::before { transform: translateX(20px); }
 
-/* ── PRODUCT GRID ── */
-.product-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
-.product-admin-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(61,31,10,.1);border:2px solid var(--cream-dark);transition:all .2s;}
-.product-admin-card:hover{border-color:var(--border-warm);box-shadow:0 4px 20px rgba(61,31,10,.15);}
-.pac-img{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--cream-dark),#e8f0e4);display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;position:relative;}
-.pac-img img{width:100%;height:100%;object-fit:cover;}
-.pac-tag{position:absolute;top:8px;left:8px;background:var(--red-taiwan);color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;}
-.pac-body{padding:16px;}
-.pac-name{font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;color:var(--wood-dark);margin-bottom:4px;}
-.pac-price{font-size:20px;font-weight:900;color:var(--red-taiwan);margin-bottom:12px;}
-.pac-actions{display:flex;gap:8px;}
-.pac-actions button{flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;transition:all .2s;}
-.btn-edit{background:var(--gold);color:#fff;}
-.btn-edit:hover{background:var(--wood-warm);}
-.btn-del{background:#fee;color:var(--red-taiwan);border:1px solid #fcc !important;}
-.btn-del:hover{background:var(--red-taiwan);color:#fff;}
+    /* ── Product form ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .img-upload-area {
+      border: 2px dashed var(--cream-dark);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .img-upload-area:hover { border-color: var(--wood-light); background: var(--cream); }
+    .img-preview { max-width: 100%; max-height: 200px; border-radius: var(--radius-sm); margin-top: 1rem; }
 
-.empty-slot{border:3px dashed var(--border-warm);background:rgba(200,146,42,.03);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;cursor:pointer;color:var(--wood-warm);font-size:15px;font-weight:700;gap:8px;transition:all .2s;}
-.empty-slot:hover{background:rgba(200,146,42,.08);border-color:var(--gold);}
-.empty-slot .plus{font-size:40px;color:var(--gold);}
+    /* ── Orders panel ── */
+    .order-row td:first-child { font-family: 'Noto Serif TC', serif; font-size: 0.8rem; color: var(--ink-mid); }
+    .status-badge { padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .status-paid { background: #d4edda; color: #155724; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-failed { background: #f8d7da; color: #721c24; }
 
-/* ── FORM ── */
-.form-panel{background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(61,31,10,.08);border:2px solid var(--cream-dark);}
-.form-panel h3{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:var(--wood-dark);margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--cream-dark);}
-.form-row{margin-bottom:18px;}
-.form-row label{display:block;font-size:15px;font-weight:700;color:var(--wood-dark);margin-bottom:6px;}
-.form-row input,.form-row textarea,.form-row select{width:100%;padding:12px 14px;font-size:15px;border:2px solid var(--cream-dark);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--text-dark);background:#fff;transition:border-color .2s;}
-.form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,146,42,.12);}
-.img-upload{border:3px dashed var(--border-warm);border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:rgba(200,146,42,.03);color:var(--wood-warm);transition:all .2s;position:relative;}
-.img-upload:hover{background:rgba(200,146,42,.08);}
-.img-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.img-upload-prev{max-width:100%;max-height:180px;border-radius:8px;margin-top:10px;display:none;}
-.form-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;}
-.form-actions button{flex:1;min-width:140px;padding:14px;font-size:16px;font-weight:700;border-radius:10px;cursor:pointer;font-family:'Noto Serif TC',serif;letter-spacing:1px;border:none;transition:all .2s;}
-.btn-save{background:linear-gradient(135deg,var(--green-deep),var(--green-mid));color:#fff;}
-.btn-save:disabled{opacity:.6;cursor:not-allowed;}
-.btn-cancel{background:var(--cream-dark);color:var(--wood-dark);border:2px solid var(--border-warm) !important;}
-.btn-delete{background:#fff;color:var(--red-taiwan);border:2px solid var(--red-taiwan) !important;}
-.btn-delete:hover{background:var(--red-taiwan);color:#fff;}
+    /* ── Messages panel ── */
+    .msg-thread {
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .msg-thread-header {
+      padding: 1rem 1.2rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .msg-thread-header h4 { font-size: 0.95rem; font-weight: 700; color: var(--wood-dark); }
+    .msg-thread-meta { font-size: 0.78rem; color: var(--ink-mid); }
+    .msg-thread-body { padding: 1rem 1.2rem; display: none; }
+    .msg-thread-body.open { display: block; }
+    .msg-bubble {
+      margin-bottom: 1rem;
+      max-width: 90%;
+    }
+    .msg-bubble.seller { margin-left: auto; }
+    .msg-bubble-inner {
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .msg-bubble .msg-bubble-inner { background: var(--cream); border: 1px solid var(--cream-dark); }
+    .msg-bubble.seller .msg-bubble-inner { background: var(--wood-dark); color: var(--cream); }
+    .msg-bubble-meta { font-size: 0.73rem; color: var(--ink-mid); margin-top: 0.3rem; }
+    .msg-bubble.seller .msg-bubble-meta { text-align: right; }
+    .reply-box { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+    .reply-box input { flex: 1; }
 
-/* ── ORDERS ── */
-.orders-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
-.orders-filter select{padding:10px 14px;font-size:15px;border:2px solid var(--cream-dark);border-radius:8px;font-family:'Noto Sans TC',sans-serif;color:var(--text-dark);background:#fff;cursor:pointer;}
-.order-card{background:#fff;border:2px solid var(--cream-dark);border-radius:12px;padding:20px;margin-bottom:14px;transition:border-color .2s;}
-.order-card:hover{border-color:var(--border-warm);}
-.order-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
-.order-id{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:900;color:var(--wood-dark);}
-.order-time{font-size:13px;color:#aaa;margin-top:2px;}
-.order-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px 16px;margin-bottom:14px;}
-.order-field .k{font-size:12px;color:#aaa;margin-bottom:2px;}
-.order-field .v{font-size:15px;font-weight:700;color:var(--text-dark);word-break:break-all;}
-.order-field .v.price{color:var(--red-taiwan);font-size:18px;}
-.order-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:2px dashed var(--cream-dark);padding-top:12px;}
-.status-select{padding:8px 12px;font-size:14px;border:2px solid var(--border-warm);border-radius:6px;font-family:'Noto Sans TC',sans-serif;color:var(--wood-dark);background:var(--cream);cursor:pointer;font-weight:700;}
-.btn-status-save{padding:8px 18px;background:var(--green-deep);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-.btn-status-save:disabled{opacity:.5;cursor:not-allowed;}
-.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;}
-.s-paid{background:#d4edda;color:#155724;}.s-shipping{background:#fff3cd;color:#856404;}.s-delivered{background:#cce5ff;color:#004085;}.s-pending{background:#fff3cd;color:#856404;}.s-failed{background:#f8d7da;color:#721c24;}
-
-/* ── MESSAGES ── */
-.msg-card{background:#fff;border:2px solid var(--cream-dark);border-radius:12px;padding:18px;margin-bottom:12px;}
-.msg-header{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:#888;}
-.msg-phone{font-weight:700;color:var(--wood-mid);font-size:15px;}
-.msg-text{font-size:16px;color:var(--text-dark);line-height:1.7;margin-bottom:10px;}
-.reply-item{background:#fff9f0;border:1px solid var(--cream-dark);border-radius:8px;padding:12px;margin-top:8px;}
-.reply-meta{font-size:12px;color:#aaa;margin-bottom:4px;}
-.reply-text{font-size:15px;color:var(--text-dark);}
-.reply-form{display:flex;gap:8px;margin-top:10px;}
-.reply-form input{flex:1;padding:10px 12px;font-size:15px;border:2px solid var(--cream-dark);border-radius:6px;font-family:'Noto Sans TC',sans-serif;}
-.reply-form input:focus{outline:none;border-color:var(--gold);}
-.reply-form button{padding:10px 18px;background:var(--wood-warm);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
-
-/* ── INTRO ── */
-.intro-panel{background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(61,31,10,.08);border:2px solid var(--cream-dark);max-width:720px;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--wood-dark);color:#fff;padding:14px 24px;border-radius:10px;font-size:16px;font-weight:700;z-index:9999;border:2px solid var(--gold);box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .3s;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);}
-
-/* ── NO DATA ── */
-.no-data{text-align:center;padding:60px;color:#aaa;font-size:17px;}
-</style>
+    @media (max-width: 900px) {
+      .admin-sidebar { width: 200px; }
+    }
+    @media (max-width: 680px) {
+      .admin-layout { flex-direction: column; }
+      .admin-sidebar { width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
-
-<!-- 登入畫面 -->
-<div id="loginScreen">
+<!-- ── LOGIN PAGE ── -->
+<div class="login-page" id="login-page">
   <div class="login-box">
-    <div class="logo">🌲 台灣紅檜精油</div>
-    <div class="sub">管理員後台 · Admin Panel</div>
-    <button class="btn-google" onclick="doLogin()">
-      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-      使用 Google 帳號登入
+    <div class="login-logo">🌲</div>
+    <h1>賣家後台</h1>
+    <p>請使用授權的 Google 帳號登入管理系統</p>
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <span class="google-icon">🔑</span>
+      以 Google 帳號登入
     </button>
-    <a class="back-link" href="index.html">← 回到前台</a>
+    <p class="login-note">⚠️ 僅限授權帳號使用，未授權帳號將被拒絕登入</p>
+    <div id="login-error" style="color:var(--red-taiwan);margin-top:1rem;font-size:0.88rem;display:none"></div>
   </div>
 </div>
 
-<!-- 管理後台主體 -->
-<div id="adminApp">
-  <header class="admin-header">
-    <div class="logo">🌲 台灣紅檜精油 · 管理後台</div>
-    <div class="user">
-      <span id="adminEmail"></span>
-      <button class="btn-logout" onclick="doLogout()">登出</button>
+<!-- ── ADMIN LAYOUT ── -->
+<div class="admin-layout" id="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">🌲 後台管理</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="active" onclick="switchPanel('dashboard', this)"><span class="ico">📊</span> 總覽</a>
+      <a href="#" onclick="switchPanel('products', this)"><span class="ico">📦</span> 商品管理</a>
+      <a href="#" onclick="switchPanel('orders', this)"><span class="ico">🧾</span> 訂單管理</a>
+      <a href="#" onclick="switchPanel('messages', this)"><span class="ico">💬</span> 客戶留言 <span id="unread-badge" class="badge badge-red" style="margin-left:auto;display:none">0</span></a>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:0.5rem 0">
+      <a href="index.html" target="_blank"><span class="ico">🌐</span> 前往前台</a>
+    </nav>
+    <div class="sidebar-user">
+      <img id="admin-avatar" src="" alt="頭像">
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="admin-name">-</div>
+        <div class="sidebar-user-role">管理員</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="登出">⏻</button>
     </div>
-  </header>
+  </aside>
 
-  <nav class="admin-nav">
-    <button class="active" onclick="switchTab('products')">🌿 商品管理</button>
-    <button onclick="switchTab('orders')">📋 訂單管理</button>
-    <button onclick="switchTab('messages')">💬 留言管理</button>
-    <button onclick="switchTab('intro')">✏️ 自我介紹</button>
-  </nav>
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2 id="panel-title">總覽</h2>
+      <div style="font-size:0.85rem;color:var(--ink-mid)" id="admin-date"></div>
+    </div>
 
-  <div class="admin-content">
+    <div class="admin-content">
 
-    <!-- ── 商品管理 ── -->
-    <div class="tab active" id="tab-products">
-      <div class="section-head">
-        <h2>🌿 商品管理</h2>
-        <button class="btn-primary" onclick="openAddForm(-1)">＋ 上架新商品</button>
-      </div>
-
-      <!-- 商品列表 -->
-      <div id="productList" style="margin-bottom:32px;">
-        <div class="no-data">⏳ 載入中...</div>
-      </div>
-
-      <!-- 新增/編輯表單 -->
-      <div class="form-panel" id="productForm" style="display:none;">
-        <h3 id="formTitle">上架新商品</h3>
-        <div class="form-row">
-          <label>商品名稱 *</label>
-          <input type="text" id="fName" placeholder="例：台灣紅檜精油 10ml">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="form-row">
-            <label>售價（新台幣）*</label>
-            <input type="number" id="fPrice" placeholder="例：680">
+      <!-- ── DASHBOARD ── -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">📦 上架商品</div>
+            <div class="stat-value" id="stat-products">–</div>
           </div>
-          <div class="form-row">
-            <label>標籤（選填）</label>
-            <input type="text" id="fTag" placeholder="例：熱銷、新品">
+          <div class="stat-card green">
+            <div class="stat-label">✅ 已付款訂單</div>
+            <div class="stat-value" id="stat-paid">–</div>
           </div>
-        </div>
-        <div class="form-row">
-          <label>商品簡介（卡片顯示）</label>
-          <textarea id="fShort" placeholder="40字以內的短描述..." style="min-height:70px;resize:vertical;"></textarea>
-        </div>
-        <div class="form-row">
-          <label>詳細描述</label>
-          <textarea id="fLong" placeholder="容量、使用方式、注意事項等..." style="min-height:120px;resize:vertical;"></textarea>
-        </div>
-        <div class="form-row">
-          <label>商品圖片</label>
-          <div class="img-upload" id="imgUploadArea">
-            <div id="imgUploadLabel">📷 點此上傳商品圖片（JPG / PNG，建議正方形）</div>
-            <input type="file" id="fImg" accept="image/*" onchange="previewFormImg(this)">
-            <img class="img-upload-prev" id="fImgPrev">
+          <div class="stat-card">
+            <div class="stat-label">⏳ 待付款訂單</div>
+            <div class="stat-value" id="stat-pending">–</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">💰 本月營收</div>
+            <div class="stat-value" id="stat-revenue">–</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">💬 未讀留言</div>
+            <div class="stat-value" id="stat-msg">–</div>
           </div>
         </div>
-        <div class="form-actions">
-          <button class="form-actions btn-save" id="btnFormSave" onclick="saveProduct()">✅ 儲存上架</button>
-          <button class="form-actions btn-cancel" onclick="closeForm()">取消</button>
-          <button class="form-actions btn-delete" id="btnFormDelete" style="display:none;" onclick="deleteProduct()">🗑️ 下架刪除</button>
+        <div style="background:var(--white);border-radius:var(--radius);padding:2rem;box-shadow:0 2px 8px var(--shadow);text-align:center">
+          <div style="font-size:3rem;margin-bottom:0.5rem">🌲</div>
+          <h3 style="font-family:'Noto Serif TC',serif;color:var(--wood-dark);margin-bottom:0.5rem">歡迎回來，管理員！</h3>
+          <p style="color:var(--ink-mid);font-size:0.9rem">使用左側選單管理商品、訂單及客戶留言</p>
         </div>
       </div>
-    </div>
 
-    <!-- ── 訂單管理 ── -->
-    <div class="tab" id="tab-orders">
-      <div class="section-head">
-        <h2>📋 訂單管理</h2>
-        <span id="orderCount" style="font-size:14px;color:#888;"></span>
-      </div>
-      <div class="orders-filter">
-        <select id="orderFilter" onchange="loadOrders()">
-          <option value="">全部訂單</option>
-          <option value="pending">⏳ 待付款</option>
-          <option value="paid">✅ 已付款</option>
-          <option value="shipping">🚚 出貨中</option>
-          <option value="delivered">📦 已送達</option>
-          <option value="payment_failed">❌ 付款失敗</option>
-        </select>
-        <button class="btn-secondary" onclick="loadOrders()">🔄 重新整理</button>
-      </div>
-      <div id="orderList"><div class="no-data">⏳ 載入中...</div></div>
-    </div>
-
-    <!-- ── 留言管理 ── -->
-    <div class="tab" id="tab-messages">
-      <div class="section-head">
-        <h2>💬 留言管理</h2>
-        <button class="btn-secondary" onclick="loadMessages()">🔄 重新整理</button>
-      </div>
-      <div id="messageList"><div class="no-data">⏳ 載入中...</div></div>
-    </div>
-
-    <!-- ── 自我介紹 ── -->
-    <div class="tab" id="tab-intro">
-      <div class="section-head"><h2>✏️ 自我介紹</h2></div>
-      <div class="intro-panel">
-        <div class="form-row">
-          <label>介紹內容</label>
-          <textarea id="introText" style="min-height:260px;resize:vertical;font-size:16px;" placeholder="填入您的個人故事、品牌理念、製作工法、聯絡電話等..."></textarea>
+      <!-- ── PRODUCTS ── -->
+      <div class="panel" id="panel-products">
+        <div class="table-wrap" style="margin-bottom:1.5rem">
+          <div class="table-toolbar">
+            <h3>商品列表</h3>
+            <button class="btn btn-gold" onclick="openProductForm()">＋ 新增商品</button>
+          </div>
+          <div id="products-list">
+            <div style="padding:2rem;text-align:center"><div class="spinner"></div></div>
+          </div>
         </div>
-        <button class="btn-primary" id="btnSaveIntro" onclick="saveIntro()" style="width:100%;padding:14px;font-size:17px;margin-top:4px;">💾 儲存自我介紹</button>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div class="panel" id="panel-orders">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <h3>所有訂單</h3>
+            <select class="form-control" style="width:auto" onchange="filterOrders(this.value)" id="order-filter">
+              <option value="">全部</option>
+              <option value="paid">已付款</option>
+              <option value="pending">待付款</option>
+              <option value="payment_failed">付款失敗</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>訂單編號</th>
+                  <th>購買者</th>
+                  <th>金額</th>
+                  <th>狀態</th>
+                  <th>日期</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="orders-body">
+                <tr><td colspan="6" style="text-align:center;padding:2rem"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MESSAGES ── -->
+      <div class="panel" id="panel-messages">
+        <div id="messages-list">
+          <div style="text-align:center;padding:2rem"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ── Product Form Modal ── -->
+<div class="modal-overlay" id="product-form-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h2 id="product-form-title">新增商品</h2>
+      <button class="modal-close" onclick="closeModal('product-form-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pf-id">
+      <div class="form-group">
+        <label>商品名稱 *</label>
+        <input type="text" class="form-control" id="pf-name" placeholder="例：台灣紅檜精油 10ml">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>售價（NT$）*</label>
+          <input type="number" class="form-control" id="pf-price" placeholder="例：580">
+        </div>
+        <div class="form-group">
+          <label>原價（NT$，選填）</label>
+          <input type="number" class="form-control" id="pf-orig-price" placeholder="例：680">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>庫存數量</label>
+          <input type="number" class="form-control" id="pf-stock" placeholder="例：50（0 = 售完）">
+        </div>
+        <div class="form-group">
+          <label>分類</label>
+          <input type="text" class="form-control" id="pf-category" placeholder="例：精油系列">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>商品描述</label>
+        <textarea class="form-control" id="pf-desc" rows="3" placeholder="商品說明、使用方式…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>商品圖片</label>
+        <div class="img-upload-area" onclick="document.getElementById('pf-img-file').click()">
+          <div id="img-upload-placeholder">
+            <div style="font-size:2.5rem;margin-bottom:0.5rem">📷</div>
+            <p style="color:var(--ink-mid);font-size:0.9rem">點擊上傳圖片</p>
+            <p style="color:var(--ink-mid);font-size:0.78rem">支援 JPG、PNG（建議 800×800px）</p>
+          </div>
+          <img id="img-preview" class="img-preview" style="display:none">
+        </div>
+        <input type="file" id="pf-img-file" accept="image/*" style="display:none" onchange="previewImage(this)">
+        <input type="hidden" id="pf-img-url">
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-published" checked>
+            <span class="slider"></span>
+          </label>
+          <span>立即上架</span>
+        </label>
       </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('product-form-modal')">取消</button>
+      <button class="btn btn-gold" onclick="saveProduct()" id="save-product-btn">儲存商品</button>
+    </div>
+  </div>
+</div>
 
-  </div><!-- /admin-content -->
-</div><!-- /adminApp -->
+<!-- Order detail modal -->
+<div class="modal-overlay" id="order-detail-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h2>訂單詳情</h2>
+      <button class="modal-close" onclick="closeModal('order-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="order-detail-body"></div>
+  </div>
+</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-         deleteDoc, query, orderBy, updateDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+const ALLOWED_EMAIL = 'enzdwllg@gmail.com';
 
-/* ── 初始化 ── */
-const app = initializeApp({
-  apiKey: "AIzaSyBYKtAPD0pin5B-1ctXIOj6CE1AO_VfHaE",
-  authDomain: "hinoki-17ffe.firebaseapp.com",
-  projectId: "hinoki-17ffe",
-  storageBucket: "hinoki-17ffe.firebasestorage.app",
-  messagingSenderId: "894705167512",
-  appId: "1:894705167512:web:f4cee2ee1d1fe6a75cf4ed"
-});
-const auth     = getAuth(app);
-const db       = getFirestore(app);
-const storage  = getStorage(app);
-const provider = new GoogleAuthProvider();
+// ── Auth ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initFirebase();
+  document.getElementById('admin-date').textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric',month:'long',day:'numeric',weekday:'long' });
 
-const ADMIN = "enzdwllg@gmail.com";
-const SLOTS = 12;
-
-let products = [];
-let editingId = null;
-let editingSlot = -1;
-let imgFile = null;
-
-const $ = id => document.getElementById(id);
-
-/* ── Toast ── */
-function toast(msg, ms=2800){
-  const el=$('toast'); el.textContent=msg; el.classList.add('show');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),ms);
-}
-function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
-function mask(p=''){return p.length>=7?p.slice(0,4)+'****'+p.slice(-3):p;}
-
-/* ── Auth ── */
-onAuthStateChanged(auth, user => {
-  if(user && user.email === ADMIN){
-    $('loginScreen').style.display = 'none';
-    $('adminApp').style.display = 'block';
-    $('adminEmail').textContent = user.email;
-    loadProducts();
-    loadIntro();
-  } else {
-    $('loginScreen').style.display = 'flex';
-    $('adminApp').style.display = 'none';
-  }
-});
-
-window.doLogin = async () => {
-  try{
-    const res = await signInWithPopup(auth, provider);
-    if(res.user.email !== ADMIN){
-      await signOut(auth);
-      toast('⚠️ 此帳號無管理權限');
+  auth.onAuthStateChanged(user => {
+    if (user && user.email === ALLOWED_EMAIL) {
+      showAdmin(user);
+    } else if (user) {
+      // Wrong account
+      auth.signOut();
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-error').textContent = `❌ 帳號 ${user.email} 無管理權限，請使用授權帳號`;
+    } else {
+      document.getElementById('login-page').style.display = 'flex';
+      document.getElementById('admin-layout').classList.remove('visible');
     }
-  } catch(e){ toast('登入失敗：' + e.message); }
-};
+  });
+});
 
-window.doLogout = async () => {
-  await signOut(auth);
-  toast('已登出');
-};
-
-/* ── Tab 切換 ── */
-window.switchTab = id => {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.admin-nav button').forEach(b => b.classList.remove('active'));
-  $('tab-' + id).classList.add('active');
-  event.target.classList.add('active');
-  if(id === 'orders')   loadOrders();
-  if(id === 'messages') loadMessages();
-};
-
-/* ════════════════════════════════
-   商品管理
-════════════════════════════════ */
-async function loadProducts(){
-  $('productList').innerHTML = '<div class="no-data">⏳ 載入中...</div>';
-  products = Array.from({length:SLOTS}, (_,i) => ({slot:i, empty:true}));
-  try{
-    const snap = await getDocs(query(collection(db,'products'), orderBy('slot')));
-    snap.forEach(d => {
-      const data = d.data(), idx = data.slot ?? 0;
-      if(idx < SLOTS) products[idx] = {id:d.id, ...data, empty:false};
-    });
-  } catch(e){ toast('❌ 載入商品失敗：' + e.message); }
-  renderProducts();
+async function loginWithGoogle() {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ login_hint: ALLOWED_EMAIL });
+    await auth.signInWithPopup(provider);
+  } catch (err) {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-error').textContent = '登入失敗：' + err.message;
+  }
 }
 
-function renderProducts(){
-  const list = $('productList');
-  const filled = products.filter(p => !p.empty);
+function showAdmin(user) {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-layout').classList.add('visible');
+  document.getElementById('admin-name').textContent = user.displayName || user.email;
+  if (user.photoURL) document.getElementById('admin-avatar').src = user.photoURL;
+  loadDashboard();
+  loadProducts();
+  loadOrders();
+  loadMessages();
+}
 
-  if(!filled.length){
-    list.innerHTML = '<div class="no-data">目前還沒有商品，點上方「上架新商品」開始新增</div>';
+async function logout() {
+  await auth.signOut();
+  location.reload();
+}
+
+// ── Panel switching ───────────────────────────────────
+function switchPanel(name, link) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  link.classList.add('active');
+  const titles = { dashboard:'總覽', products:'商品管理', orders:'訂單管理', messages:'客戶留言' };
+  document.getElementById('panel-title').textContent = titles[name] || '';
+}
+
+// ── Dashboard stats ───────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [prodSnap, ordersSnap, msgSnap] = await Promise.all([
+      db.collection('products').where('published','==',true).get(),
+      db.collection('orders').get(),
+      db.collection('messages').where('hasUnread','==',true).get()
+    ]);
+
+    const orders = ordersSnap.docs.map(d => d.data());
+    const paid = orders.filter(o => o.status === 'paid');
+    const pending = orders.filter(o => o.status === 'pending');
+    const now = new Date(); const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const revenue = paid.filter(o => o.createdAt?.toDate() >= monthStart).reduce((s, o) => s + (o.total || 0), 0);
+
+    document.getElementById('stat-products').textContent = prodSnap.size;
+    document.getElementById('stat-paid').textContent = paid.length;
+    document.getElementById('stat-pending').textContent = pending.length;
+    document.getElementById('stat-revenue').textContent = formatPrice(revenue);
+    document.getElementById('stat-msg').textContent = msgSnap.size;
+    if (msgSnap.size > 0) {
+      document.getElementById('unread-badge').textContent = msgSnap.size;
+      document.getElementById('unread-badge').style.display = '';
+    }
+  } catch (e) { console.error(e); }
+}
+
+// ── Products ──────────────────────────────────────────
+let allProducts = [];
+
+async function loadProducts() {
+  try {
+    const snap = await db.collection('products').orderBy('createdAt','desc').get();
+    allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderProductsList();
+  } catch (e) { console.error(e); }
+}
+
+function renderProductsList() {
+  const container = document.getElementById('products-list');
+  if (!allProducts.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><h3>尚無商品</h3><p>點擊「新增商品」開始上架</p></div>';
     return;
   }
-
-  const grid = document.createElement('div');
-  grid.className = 'product-admin-grid';
-
-  products.forEach((p, i) => {
-    const card = document.createElement('div');
-    if(p.empty){
-      card.className = 'empty-slot';
-      card.innerHTML = `<div class="plus">＋</div><div>槽位 ${i+1}（空）</div>`;
-      card.onclick = () => openAddForm(i);
-    } else {
-      card.className = 'product-admin-card';
-      card.innerHTML = `
-        <div class="pac-img">
-          ${p.img ? `<img src="${p.img}" alt="${esc(p.name)}">` : '🌲'}
-          ${p.tag ? `<div class="pac-tag">${esc(p.tag)}</div>` : ''}
-        </div>
-        <div class="pac-body">
-          <div class="pac-name">${esc(p.name)}</div>
-          <div class="pac-price">NT$${Number(p.price).toLocaleString()}</div>
-          <div class="pac-actions">
-            <button class="btn-edit" onclick="openEditForm('${p.id}')">✏️ 編輯</button>
-            <button class="btn-del" onclick="confirmDelete('${p.id}', '${esc(p.name)}')">🗑️ 下架</button>
-          </div>
-        </div>`;
-    }
-    grid.appendChild(card);
-  });
-  list.innerHTML = '';
-  list.appendChild(grid);
+  container.innerHTML = `<div style="overflow-x:auto"><table>
+    <thead><tr><th>圖片</th><th>商品名稱</th><th>售價</th><th>庫存</th><th>分類</th><th>上架</th><th>操作</th></tr></thead>
+    <tbody>
+    ${allProducts.map(p => `
+      <tr>
+        <td>${p.imageUrl ? `<img class="product-thumb" src="${p.imageUrl}" alt="">` : '<div class="product-thumb">🌲</div>'}</td>
+        <td><strong>${p.name}</strong></td>
+        <td style="color:var(--red-taiwan);font-weight:700">${formatPrice(p.price)}</td>
+        <td>${p.stock ?? '–'}</td>
+        <td>${p.category || '–'}</td>
+        <td>
+          <label class="toggle-switch">
+            <input type="checkbox" ${p.published ? 'checked' : ''} onchange="togglePublished('${p.id}', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-outline btn-sm" onclick='editProduct(${JSON.stringify(p)})'>編輯</button>
+          <button class="btn btn-sm" style="background:var(--red-taiwan);color:#fff;border-color:var(--red-taiwan);margin-left:4px" onclick="deleteProduct('${p.id}', '${p.name}')">刪除</button>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
 }
 
-window.openAddForm = (slot) => {
-  editingId = null;
-  editingSlot = slot;
-  imgFile = null;
-  $('formTitle').textContent = '上架新商品';
-  ['fName','fPrice','fTag','fShort','fLong'].forEach(id => $(id).value = '');
-  $('fImgPrev').style.display = 'none';
-  $('fImg').value = '';
-  $('imgUploadLabel').textContent = '📷 點此上傳商品圖片（JPG / PNG，建議正方形）';
-  $('btnFormSave').textContent = '✅ 儲存上架';
-  $('btnFormDelete').style.display = 'none';
-  $('productForm').style.display = 'block';
-  $('productForm').scrollIntoView({behavior:'smooth', block:'start'});
-};
+async function togglePublished(id, val) {
+  await db.collection('products').doc(id).update({ published: val });
+  const p = allProducts.find(p => p.id === id);
+  if (p) p.published = val;
+  showToast(val ? '商品已上架' : '商品已下架', 'success');
+}
 
-window.openEditForm = (id) => {
-  const p = products.find(p => p.id === id);
-  if(!p) return;
-  editingId = id;
-  editingSlot = p.slot ?? -1;
-  imgFile = null;
-  $('formTitle').textContent = '編輯商品';
-  $('fName').value  = p.name || '';
-  $('fPrice').value = p.price || '';
-  $('fTag').value   = p.tag || '';
-  $('fShort').value = p.shortDesc || '';
-  $('fLong').value  = p.longDesc || '';
-  if(p.img){
-    $('fImgPrev').src = p.img;
-    $('fImgPrev').style.display = 'block';
-    $('imgUploadLabel').textContent = '✅ 目前圖片（可重新上傳）';
-  } else {
-    $('fImgPrev').style.display = 'none';
-    $('imgUploadLabel').textContent = '📷 點此上傳商品圖片';
+async function deleteProduct(id, name) {
+  if (!confirm(`確定要刪除「${name}」嗎？此動作不可復原。`)) return;
+  await db.collection('products').doc(id).delete();
+  allProducts = allProducts.filter(p => p.id !== id);
+  renderProductsList();
+  showToast('商品已刪除', 'success');
+}
+
+function openProductForm(reset = true) {
+  if (reset) {
+    document.getElementById('pf-id').value = '';
+    document.getElementById('pf-name').value = '';
+    document.getElementById('pf-price').value = '';
+    document.getElementById('pf-orig-price').value = '';
+    document.getElementById('pf-stock').value = '';
+    document.getElementById('pf-category').value = '精油系列';
+    document.getElementById('pf-desc').value = '';
+    document.getElementById('pf-img-url').value = '';
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('img-upload-placeholder').style.display = 'block';
+    document.getElementById('pf-published').checked = true;
+    document.getElementById('product-form-title').textContent = '新增商品';
   }
-  $('fImg').value = '';
-  $('btnFormSave').textContent = '💾 儲存修改';
-  $('btnFormDelete').style.display = 'block';
-  $('productForm').style.display = 'block';
-  $('productForm').scrollIntoView({behavior:'smooth', block:'start'});
-};
+  document.getElementById('product-form-modal').classList.add('open');
+}
 
-window.closeForm = () => {
-  $('productForm').style.display = 'none';
-  editingId = null; imgFile = null;
-};
+function editProduct(p) {
+  document.getElementById('pf-id').value = p.id;
+  document.getElementById('pf-name').value = p.name || '';
+  document.getElementById('pf-price').value = p.price || '';
+  document.getElementById('pf-orig-price').value = p.originalPrice || '';
+  document.getElementById('pf-stock').value = p.stock ?? '';
+  document.getElementById('pf-category').value = p.category || '';
+  document.getElementById('pf-desc').value = p.description || '';
+  document.getElementById('pf-img-url').value = p.imageUrl || '';
+  document.getElementById('pf-published').checked = !!p.published;
+  document.getElementById('product-form-title').textContent = '編輯商品';
+  if (p.imageUrl) {
+    document.getElementById('img-preview').src = p.imageUrl;
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('img-upload-placeholder').style.display = 'none';
+  } else {
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('img-upload-placeholder').style.display = 'block';
+  }
+  openProductForm(false);
+}
 
-window.previewFormImg = input => {
-  const file = input.files[0]; if(!file) return;
-  imgFile = file;
-  const r = new FileReader();
-  r.onload = e => {
-    $('fImgPrev').src = e.target.result;
-    $('fImgPrev').style.display = 'block';
-    $('imgUploadLabel').textContent = '✅ ' + file.name;
+function previewImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('img-preview').src = e.target.result;
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('img-upload-placeholder').style.display = 'none';
   };
-  r.readAsDataURL(file);
-};
+  reader.readAsDataURL(file);
+}
 
-window.saveProduct = async () => {
-  const name  = $('fName').value.trim();
-  const price = parseInt($('fPrice').value);
-  if(!name || !price){ toast('⚠️ 請填寫商品名稱與售價'); return; }
+async function saveProduct() {
+  const name  = document.getElementById('pf-name').value.trim();
+  const price = parseFloat(document.getElementById('pf-price').value);
+  if (!name || isNaN(price)) { showToast('請填寫商品名稱和售價', 'error'); return; }
 
-  const btn = $('btnFormSave');
-  btn.disabled = true;
+  const btn = document.getElementById('save-product-btn');
+  btn.disabled = true; btn.textContent = '儲存中…';
 
   try {
-    // 上傳圖片
-    let imgUrl = editingId ? (products.find(p=>p.id===editingId)?.img || null) : null;
-    if(imgFile){
-      btn.textContent = '⏳ 上傳圖片中...';
-      const ref = sRef(storage, `products/${Date.now()}_${imgFile.name}`);
-      const snap = await uploadBytes(ref, imgFile);
-      imgUrl = await getDownloadURL(snap.ref);
+    let imageUrl = document.getElementById('pf-img-url').value;
+    const file = document.getElementById('pf-img-file').files[0];
+    if (file) {
+      const ref = storage.ref(`products/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      imageUrl = await ref.getDownloadURL();
     }
 
-    btn.textContent = '⏳ 儲存中...';
     const data = {
-      name, price,
-      img:       imgUrl,
-      tag:       $('fTag').value.trim(),
-      shortDesc: $('fShort').value.trim(),
-      longDesc:  $('fLong').value.trim(),
+      name,
+      price,
+      originalPrice: parseFloat(document.getElementById('pf-orig-price').value) || null,
+      stock: parseInt(document.getElementById('pf-stock').value) ?? null,
+      category: document.getElementById('pf-category').value.trim() || '精油系列',
+      description: document.getElementById('pf-desc').value.trim(),
+      imageUrl,
+      published: document.getElementById('pf-published').checked,
     };
 
-    if(editingId){
-      await updateDoc(doc(db,'products',editingId), {...data, updatedAt: serverTimestamp()});
-      toast('✅ 商品已更新！');
+    const id = document.getElementById('pf-id').value;
+    if (id) {
+      await db.collection('products').doc(id).update(data);
+      const idx = allProducts.findIndex(p => p.id === id);
+      if (idx > -1) allProducts[idx] = { id, ...data };
     } else {
-      const slot = editingSlot >= 0 ? editingSlot : products.findIndex(p => p.empty);
-      if(slot < 0){ toast('⚠️ 已無空槽（最多12項）'); return; }
-      await addDoc(collection(db,'products'), {...data, slot, createdAt: serverTimestamp()});
-      toast('✅ 商品已上架！');
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await db.collection('products').add(data);
+      allProducts.unshift({ id: ref.id, ...data });
     }
 
-    closeForm();
-    await loadProducts();
-  } catch(e){
-    console.error(e);
-    if(e.code === 'storage/unauthorized') toast('❌ 圖片上傳失敗：請確認 Storage 規則');
-    else if(e.code === 'permission-denied') toast('❌ 權限不足：請確認 Firestore 規則');
-    else toast('❌ 失敗：' + e.message);
+    renderProductsList();
+    closeModal('product-form-modal');
+    showToast('商品已儲存 ✓', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('儲存失敗：' + err.message, 'error');
   } finally {
-    btn.textContent = editingId ? '💾 儲存修改' : '✅ 儲存上架';
-    btn.disabled = false;
+    btn.disabled = false; btn.textContent = '儲存商品';
   }
-};
-
-window.confirmDelete = async (id, name) => {
-  if(!confirm(`確定要下架「${name}」嗎？`)) return;
-  try{
-    await deleteDoc(doc(db,'products',id));
-    toast('✅ 已下架');
-    await loadProducts();
-  } catch(e){ toast('❌ 下架失敗：' + e.message); }
-};
-
-window.deleteProduct = async () => {
-  if(!editingId) return;
-  const p = products.find(p => p.id === editingId);
-  if(!confirm(`確定要下架「${p?.name}」嗎？`)) return;
-  try{
-    await deleteDoc(doc(db,'products',editingId));
-    toast('✅ 已下架');
-    closeForm();
-    await loadProducts();
-  } catch(e){ toast('❌ 失敗：' + e.message); }
-};
-
-/* ════════════════════════════════
-   訂單管理
-════════════════════════════════ */
-const STATUS_MAP = {
-  pending:        {l:'⏳ 待付款',   c:'s-pending'},
-  paid:           {l:'✅ 已付款',   c:'s-paid'},
-  shipping:       {l:'🚚 出貨中',   c:'s-shipping'},
-  delivered:      {l:'📦 已送達',   c:'s-delivered'},
-  payment_failed: {l:'❌ 付款失敗', c:'s-failed'},
-};
-
-window.loadOrders = async () => {
-  const list = $('orderList');
-  list.innerHTML = '<div class="no-data">⏳ 載入中...</div>';
-  try{
-    const filter = $('orderFilter').value;
-    const snap = await getDocs(query(collection(db,'orders'), orderBy('createdAt','desc')));
-    let orders = [];
-    snap.forEach(d => orders.push({id:d.id, ...d.data()}));
-    if(filter) orders = orders.filter(o => o.status === filter);
-    $('orderCount').textContent = `共 ${orders.length} 筆`;
-    if(!orders.length){ list.innerHTML = '<div class="no-data">📭 沒有符合的訂單</div>'; return; }
-
-    list.innerHTML = orders.map(o => {
-      const ts = o.createdAt?.toDate?.();
-      const t  = ts ? ts.toLocaleString('zh-TW') : '-';
-      const st = STATUS_MAP[o.status] || STATUS_MAP.pending;
-      const amt = 'NT$' + Number(o.total||0).toLocaleString();
-      return `<div class="order-card">
-        <div class="order-top">
-          <div>
-            <div class="order-id">${esc(o.id)}</div>
-            <div class="order-time">${t}</div>
-          </div>
-          <span class="status-badge ${st.c}">${st.l}</span>
-        </div>
-        <div class="order-fields">
-          <div class="order-field"><div class="k">商品</div><div class="v">${esc(o.product||'-')}</div></div>
-          <div class="order-field"><div class="k">數量</div><div class="v">${o.qty||1} 瓶</div></div>
-          <div class="order-field"><div class="k">金額</div><div class="v price">${amt}</div></div>
-          <div class="order-field"><div class="k">收件人</div><div class="v">${esc(o.name||'-')}</div></div>
-          <div class="order-field"><div class="k">手機</div><div class="v">${esc(o.phone||'-')}</div></div>
-          <div class="order-field"><div class="k">地址</div><div class="v">${esc(o.addr||'-')}</div></div>
-          ${o.email ? `<div class="order-field"><div class="k">Email</div><div class="v">${esc(o.email)}</div></div>` : ''}
-          ${o.note  ? `<div class="order-field"><div class="k">備註</div><div class="v">${esc(o.note)}</div></div>`  : ''}
-        </div>
-        <div class="order-actions">
-          <label style="font-size:14px;font-weight:700;color:var(--wood-dark);white-space:nowrap;">更新狀態：</label>
-          <select class="status-select" id="sel-${o.id}">
-            <option value="pending"        ${o.status==='pending'        ?'selected':''}>⏳ 待付款</option>
-            <option value="paid"           ${o.status==='paid'           ?'selected':''}>✅ 已付款</option>
-            <option value="shipping"       ${o.status==='shipping'       ?'selected':''}>🚚 出貨中</option>
-            <option value="delivered"      ${o.status==='delivered'      ?'selected':''}>📦 已送達</option>
-            <option value="payment_failed" ${o.status==='payment_failed' ?'selected':''}>❌ 付款失敗</option>
-          </select>
-          <button class="btn-status-save" id="upd-${o.id}" onclick="updateStatus('${o.id}')">儲存</button>
-          <button class="btn-secondary" onclick="copyOrder('${o.id}')">📋 複製資料</button>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e){
-    list.innerHTML = `<div class="no-data">❌ 載入失敗：${esc(e.message)}</div>`;
-  }
-};
-
-window.updateStatus = async (orderId) => {
-  const sel = $('sel-' + orderId);
-  const btn = $('upd-' + orderId);
-  const newStatus = sel.value;
-  btn.textContent = '⏳'; btn.disabled = true;
-  try{
-    await updateDoc(doc(db,'orders',orderId), {status:newStatus, updatedAt:serverTimestamp()});
-    toast('✅ 已更新為：' + STATUS_MAP[newStatus]?.l);
-    const card  = btn.closest('.order-card');
-    const badge = card.querySelector('.status-badge');
-    const st    = STATUS_MAP[newStatus];
-    badge.textContent = st.l; badge.className = 'status-badge ' + st.c;
-    btn.textContent = '✅';
-    setTimeout(() => { btn.textContent = '儲存'; btn.disabled = false; }, 1500);
-  } catch(e){ toast('❌ 更新失敗：' + e.message); btn.textContent = '儲存'; btn.disabled = false; }
-};
-
-window.copyOrder = async (orderId) => {
-  try{
-    const d = await getDoc(doc(db,'orders',orderId));
-    if(!d.exists()) return;
-    const o = d.data();
-    const text = [
-      '訂單編號：' + orderId,
-      '商品：' + (o.product||'-') + ' × ' + (o.qty||1),
-      '金額：NT$' + Number(o.total||0).toLocaleString(),
-      '收件人：' + (o.name||'-'),
-      '手機：' + (o.phone||'-'),
-      '地址：' + (o.addr||'-'),
-      o.email ? 'Email：' + o.email : '',
-      o.note  ? '備註：'  + o.note  : '',
-    ].filter(Boolean).join('\n');
-    await navigator.clipboard.writeText(text);
-    toast('✅ 已複製訂單資料');
-  } catch(e){ toast('複製失敗，請手動複製'); }
-};
-
-/* ════════════════════════════════
-   留言管理
-════════════════════════════════ */
-window.loadMessages = async () => {
-  const list = $('messageList');
-  list.innerHTML = '<div class="no-data">⏳ 載入中...</div>';
-  try{
-    const snap = await getDocs(query(collection(db,'messages'), orderBy('createdAt','desc')));
-    if(snap.empty){ list.innerHTML = '<div class="no-data">📭 目前沒有留言</div>'; return; }
-    const msgs = [];
-    snap.forEach(d => msgs.push({id:d.id, ...d.data()}));
-    list.innerHTML = msgs.map(m => {
-      const ts = m.createdAt?.toDate?.();
-      const t  = ts ? ts.toLocaleString('zh-TW') : '';
-      const reps = m.replies || [];
-      return `<div class="msg-card">
-        <div class="msg-header">
-          <span class="msg-phone">${mask(m.phone||'')}</span>
-          <span>${t}</span>
-        </div>
-        <div class="msg-text">${esc(m.content||'')}</div>
-        ${reps.map(r=>`
-          <div class="reply-item">
-            <div class="reply-meta">${r.type==='owner'?'🌿 店主回覆':'💬 買家追問'} · ${r.at||''}</div>
-            <div class="reply-text">${esc(r.text||'')}</div>
-          </div>`).join('')}
-        <div class="reply-form">
-          <input type="text" id="ri-${m.id}" placeholder="輸入回覆內容...">
-          <button onclick="replyMsg('${m.id}')">↩️ 回覆</button>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e){ list.innerHTML = `<div class="no-data">❌ 載入失敗：${esc(e.message)}</div>`; }
-};
-
-window.replyMsg = async (msgId) => {
-  const inp  = $('ri-' + msgId);
-  const text = inp?.value.trim();
-  if(!text) return;
-  try{
-    const ref  = doc(db,'messages',msgId);
-    const snap = await getDoc(ref);
-    if(!snap.exists()) return;
-    const reps = snap.data().replies || [];
-    reps.push({text, at:new Date().toLocaleString('zh-TW'), type:'owner'});
-    await updateDoc(ref, {replies:reps});
-    inp.value = '';
-    toast('✅ 回覆已送出');
-    await loadMessages();
-  } catch(e){ toast('❌ 回覆失敗：' + e.message); }
-};
-
-/* ════════════════════════════════
-   自我介紹
-════════════════════════════════ */
-async function loadIntro(){
-  try{
-    const d = await getDoc(doc(db,'settings','intro'));
-    if(d.exists() && d.data().text) $('introText').value = d.data().text;
-  } catch(e){}
 }
 
-window.saveIntro = async () => {
-  const text = $('introText').value.trim();
-  if(!text){ toast('⚠️ 請填寫介紹內容'); return; }
-  const btn = $('btnSaveIntro');
-  btn.textContent = '⏳ 儲存中...'; btn.disabled = true;
-  try{
-    await setDoc(doc(db,'settings','intro'), {text, updatedAt:serverTimestamp()});
-    toast('✅ 自我介紹已儲存');
-  } catch(e){
-    if(e.code==='permission-denied') toast('❌ 權限不足：請確認 Firestore 規則');
-    else toast('❌ 儲存失敗：' + e.message);
-  } finally {
-    btn.textContent = '💾 儲存自我介紹'; btn.disabled = false;
-  }
-};
+// ── Orders ────────────────────────────────────────────
+let allOrders = [];
+
+async function loadOrders() {
+  try {
+    const snap = await db.collection('orders').orderBy('createdAt','desc').get();
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderOrders('');
+  } catch (e) { console.error(e); }
+}
+
+function filterOrders(status) { renderOrders(status); }
+
+function renderOrders(statusFilter) {
+  const list = statusFilter ? allOrders.filter(o => o.status === statusFilter) : allOrders;
+  const statusClass = { paid:'status-paid', pending:'status-pending', payment_failed:'status-failed' };
+  const statusLabel = { paid:'已付款', pending:'待付款', payment_failed:'付款失敗' };
+  document.getElementById('orders-body').innerHTML = !list.length
+    ? '<tr><td colspan="6" class="empty-state" style="text-align:center;padding:2rem">無符合訂單</td></tr>'
+    : list.map(o => `<tr class="order-row">
+        <td>${o.orderId}</td>
+        <td>${o.buyer?.name || '–'}<br><small>${o.buyer?.phone || ''}</small></td>
+        <td style="font-weight:700;color:var(--red-taiwan)">${formatPrice(o.total)}</td>
+        <td><span class="status-badge ${statusClass[o.status] || ''}">${statusLabel[o.status] || o.status}</span></td>
+        <td>${o.createdAt ? formatDate(o.createdAt) : '–'}</td>
+        <td><button class="btn btn-outline btn-sm" onclick='viewOrder(${JSON.stringify(o)})'>查看</button></td>
+      </tr>`).join('');
+}
+
+function viewOrder(o) {
+  const statusLabel = { paid:'✅ 已付款', pending:'⏳ 待付款', payment_failed:'❌ 付款失敗' };
+  document.getElementById('order-detail-body').innerHTML = `
+    <p><strong>訂單編號：</strong>${o.orderId}</p>
+    <p><strong>狀態：</strong>${statusLabel[o.status] || o.status}</p>
+    <p><strong>金額：</strong><span style="color:var(--red-taiwan);font-weight:700">${formatPrice(o.total)}</span></p>
+    <hr style="border:none;border-top:1px solid var(--cream-dark);margin:1rem 0">
+    <p><strong>購買者：</strong>${o.buyer?.name}</p>
+    <p><strong>電話：</strong>${o.buyer?.phone}</p>
+    <p><strong>Email：</strong>${o.buyer?.email || '–'}</p>
+    <p><strong>地址：</strong>${o.buyer?.address}</p>
+    ${o.buyer?.note ? `<p><strong>備註：</strong>${o.buyer.note}</p>` : ''}
+    <hr style="border:none;border-top:1px solid var(--cream-dark);margin:1rem 0">
+    <p><strong>商品：</strong></p>
+    <ul style="padding-left:1.2rem;margin-top:0.5rem">
+      ${(o.items || []).map(i => `<li>${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}</li>`).join('')}
+    </ul>
+    <p style="margin-top:0.5rem"><strong>日期：</strong>${o.createdAt ? formatDate(o.createdAt) : '–'}</p>`;
+  document.getElementById('order-detail-modal').classList.add('open');
+}
+
+// ── Messages ──────────────────────────────────────────
+async function loadMessages() {
+  const list = document.getElementById('messages-list');
+  try {
+    const snap = await db.collection('messages').orderBy('createdAt','desc').get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">💬</div><h3>尚無客戶留言</h3></div>';
+      return;
+    }
+    list.innerHTML = '';
+    for (const doc of snap.docs) {
+      const m = { id: doc.id, ...doc.data() };
+      list.insertAdjacentHTML('beforeend', renderMsgThread(m));
+    }
+  } catch (e) { console.error(e); list.innerHTML = '<p style="text-align:center;color:var(--red-taiwan)">載入失敗</p>'; }
+}
+
+function renderMsgThread(m) {
+  const repliesHtml = (m.replies || []).map(r => `
+    <div class="msg-bubble ${r.role === 'seller' ? 'seller' : ''}">
+      <div class="msg-bubble-inner">${r.content}</div>
+      <div class="msg-bubble-meta">${r.role === 'seller' ? '賣家' : r.name} · ${r.time || ''}</div>
+    </div>`).join('');
+  return `
+  <div class="msg-thread" id="thread-${m.id}">
+    <div class="msg-thread-header" onclick="toggleThread('${m.id}')">
+      <div>
+        <h4>${m.name} <span class="badge badge-wood" style="margin-left:0.5rem">${m.orderQuery || '一般詢問'}</span>
+        ${m.hasUnread ? '<span class="badge badge-red" style="margin-left:0.5rem">未讀</span>' : ''}</h4>
+        <div class="msg-thread-meta">聯絡：${m.contact} · ${m.createdAt ? formatDate(m.createdAt) : ''}</div>
+      </div>
+      <span style="color:var(--ink-mid)">▾</span>
+    </div>
+    <div class="msg-thread-body" id="tbody-${m.id}">
+      <div class="msg-bubble">
+        <div class="msg-bubble-inner">${m.content}</div>
+        <div class="msg-bubble-meta">${m.name} · ${m.createdAt ? formatDate(m.createdAt) : ''}</div>
+      </div>
+      ${repliesHtml}
+      <div class="reply-box">
+        <input type="text" class="form-control" id="reply-input-${m.id}" placeholder="輸入回覆…">
+        <button class="btn btn-primary btn-sm" onclick="sendSellerReply('${m.id}')">回覆</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleThread(id) {
+  const body = document.getElementById('tbody-' + id);
+  body.classList.toggle('open');
+  // Mark as read
+  try { await db.collection('messages').doc(id).update({ hasUnread: false }); } catch {}
+}
+
+async function sendSellerReply(id) {
+  const inp = document.getElementById('reply-input-' + id);
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  const reply = {
+    role: 'seller', content: text,
+    time: new Date().toLocaleString('zh-TW'),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  await db.collection('messages').doc(id).update({
+    replies: firebase.firestore.FieldValue.arrayUnion(reply)
+  });
+  showToast('回覆已送出 ✓', 'success');
+  loadMessages();
+}
+
+// ── Modal helpers ─────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
+});
 </script>
 </body>
 </html>

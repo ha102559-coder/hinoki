@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>聯絡商家 — 檜木精油本舖</title>
+  <meta name="description" content="有任何問題歡迎聯絡我們，我們會盡快回覆您。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌲</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-layout {
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    /* ── Left: info ── */
+    .contact-info {
+      background: linear-gradient(160deg, var(--wood-dark), var(--green-deep));
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      color: var(--cream);
+      position: sticky;
+      top: 90px;
+    }
+    .contact-info h2 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+    }
+    .contact-info p { opacity: 0.85; font-size: 0.9rem; margin-bottom: 2rem; line-height: 1.8; }
+    .info-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-start;
+    }
+    .info-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .info-label { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.2rem; color: var(--gold-light); }
+    .info-val { font-size: 0.88rem; opacity: 0.85; }
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 1.5rem 0; }
+
+    /* ── Right: forms ── */
+    .contact-right { display: flex; flex-direction: column; gap: 2rem; }
+
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      border: 1px solid var(--cream-dark);
+    }
+    .form-card h3 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--cream-dark);
+    }
+
+    /* ── Query section ── */
+    .query-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      border: 1px solid var(--cream-dark);
+    }
+    .query-card h3 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--cream-dark);
+    }
+
+    /* ── Thread display ── */
+    .thread-list { margin-top: 1rem; }
+    .thread-item {
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .thread-header {
+      background: var(--cream);
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .thread-header h4 { font-size: 0.95rem; font-weight: 700; color: var(--wood-dark); }
+    .thread-header .meta { font-size: 0.78rem; color: var(--ink-mid); margin-top: 0.15rem; }
+    .thread-body { padding: 1rem; display: none; }
+    .thread-body.open { display: block; }
+    .bubble {
+      max-width: 88%;
+      margin-bottom: 0.9rem;
+    }
+    .bubble.mine { margin-left: auto; }
+    .bubble-inner {
+      background: var(--cream);
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.9rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .bubble.mine .bubble-inner {
+      background: var(--wood-dark);
+      color: var(--cream);
+      border-color: var(--wood-dark);
+    }
+    .bubble.seller-reply .bubble-inner {
+      background: var(--green-pale);
+      border-color: var(--green-light);
+      color: var(--green-deep);
+    }
+    .bubble-meta { font-size: 0.72rem; color: var(--ink-mid); margin-top: 0.2rem; }
+    .bubble.mine .bubble-meta { text-align: right; }
+    .customer-reply-box {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--cream-dark);
+    }
+    .customer-reply-box input { flex: 1; }
+
+    @media (max-width: 820px) {
+      .contact-layout { grid-template-columns: 1fr; }
+      .contact-info { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-icon">🌲</span>
+      檜木精油本舖
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">首頁</a></li>
+      <li><a href="contact.html" class="active">聯絡商家</a></li>
+      <li><a href="privacy.html">隱私政策</a></li>
+      <li>
+        <a href="index.html#products" class="nav-cart-btn">
+          🛒 購物車
+          <span class="cart-count" id="cart-count">0</span>
+        </a>
+      </li>
+    </ul>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</nav>
+
+<!-- ── Page header ── -->
+<div class="page-header">
+  <h1>💬 聯絡商家</h1>
+  <p>有任何問題、建議或訂購需求，歡迎留言，我們會盡快回覆您</p>
+</div>
+
+<!-- ── Main layout ── -->
+<div class="contact-layout">
+
+  <!-- Left info panel -->
+  <aside class="contact-info">
+    <h2>🌲 檜木精油本舖</h2>
+    <p>深耕台灣山林，為您提供最純粹的天然精油。<br>有任何問題歡迎留言，通常在 24 小時內回覆。</p>
+    <div class="info-item">
+      <div class="info-icon">📍</div>
+      <div>
+        <div class="info-label">產地</div>
+        <div class="info-val">台灣阿里山地區</div>
+      </div>
+    </div>
+    <div class="info-item">
+      <div class="info-icon">⏰</div>
+      <div>
+        <div class="info-label">回覆時間</div>
+        <div class="info-val">週一至週六 9:00–18:00<br>通常 24 小時內回覆</div>
+      </div>
+    </div>
+    <div class="info-item">
+      <div class="info-icon">📦</div>
+      <div>
+        <div class="info-label">配送時間</div>
+        <div class="info-val">付款後 2–5 個工作天到貨</div>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="info-item">
+      <div class="info-icon">💡</div>
+      <div>
+        <div class="info-label">常見問題</div>
+        <div class="info-val">訂單查詢請提供訂單編號或聯絡資料，我們將協助確認</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right forms -->
+  <div class="contact-right">
+
+    <!-- 留言表單 -->
+    <div class="form-card">
+      <h3>📝 留言給我們</h3>
+      <div class="form-group">
+        <label>您的姓名 *</label>
+        <input type="text" class="form-control" id="msg-name" placeholder="請輸入姓名">
+      </div>
+      <div class="form-group">
+        <label>聯絡方式（電話或 Email）*</label>
+        <input type="text" class="form-control" id="msg-contact" placeholder="方便我們回覆您">
+      </div>
+      <div class="form-group">
+        <label>詢問類型</label>
+        <select class="form-control" id="msg-type">
+          <option value="一般詢問">一般詢問</option>
+          <option value="訂單查詢">訂單查詢</option>
+          <option value="商品問題">商品問題</option>
+          <option value="退換貨">退換貨</option>
+          <option value="合作洽詢">合作洽詢</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>訂單編號（選填）</label>
+        <input type="text" class="form-control" id="msg-order-id" placeholder="例：ORD-17234567890ABC（查詢訂單時填寫）">
+      </div>
+      <div class="form-group">
+        <label>留言內容 *</label>
+        <textarea class="form-control" id="msg-content" rows="4" placeholder="請詳細描述您的問題或需求…"></textarea>
+      </div>
+      <button class="btn btn-gold btn-block" onclick="submitMessage()">📨 送出留言</button>
+      <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--ink-mid);text-align:center">
+        送出後請記下您的聯絡方式，方便使用下方功能查詢回覆
+      </p>
+    </div>
+
+    <!-- 查詢留言 -->
+    <div class="query-card">
+      <h3>🔍 查詢我的留言</h3>
+      <p style="font-size:0.88rem;color:var(--ink-mid);margin-bottom:1.2rem">
+        輸入您留言時填寫的聯絡方式，即可查看留言及賣家回覆
+      </p>
+      <div style="display:flex;gap:0.75rem">
+        <input type="text" class="form-control" id="query-contact" placeholder="輸入電話或 Email">
+        <button class="btn btn-primary" onclick="queryMessages()">查詢</button>
+      </div>
+      <div id="query-results" class="thread-list" style="margin-top:1.5rem"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">🌲 檜木精油本舖</div>
+  <div class="footer-links">
+    <a href="index.html">首頁</a>
+    <a href="contact.html">聯絡商家</a>
+    <a href="privacy.html">隱私政策</a>
+  </div>
+  <p>© 2025 檜木精油本舖 · 台灣製造 · 純天然無添加</p>
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initFirebase(); });
+
+// ── Submit message ────────────────────────────────────
+async function submitMessage() {
+  const name    = document.getElementById('msg-name').value.trim();
+  const contact = document.getElementById('msg-contact').value.trim();
+  const type    = document.getElementById('msg-type').value;
+  const orderId = document.getElementById('msg-order-id').value.trim();
+  const content = document.getElementById('msg-content').value.trim();
+
+  if (!name || !contact || !content) {
+    showToast('請填寫必填欄位（姓名、聯絡方式、留言內容）', 'error');
+    return;
+  }
+
+  try {
+    await db.collection('messages').add({
+      name, contact, content,
+      orderQuery: orderId ? `訂單 ${orderId}` : type,
+      status: 'open',
+      hasUnread: true,
+      replies: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    showToast('留言已送出！我們將盡快回覆您 ✓', 'success');
+    document.getElementById('msg-name').value = '';
+    document.getElementById('msg-contact').value = '';
+    document.getElementById('msg-content').value = '';
+    document.getElementById('msg-order-id').value = '';
+    document.getElementById('msg-type').value = '一般詢問';
+
+    // Auto-query with same contact
+    document.getElementById('query-contact').value = contact;
+    setTimeout(() => queryMessages(), 800);
+  } catch (err) {
+    console.error(err);
+    showToast('送出失敗，請重試', 'error');
+  }
+}
+
+// ── Query messages ────────────────────────────────────
+async function queryMessages() {
+  const contact = document.getElementById('query-contact').value.trim();
+  const results = document.getElementById('query-results');
+  if (!contact) { showToast('請輸入聯絡方式', 'error'); return; }
+
+  results.innerHTML = '<div class="spinner"></div>';
+
+  try {
+    const snap = await db.collection('messages')
+      .where('contact', '==', contact)
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    if (snap.empty) {
+      results.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>找不到留言記錄</h3><p>請確認聯絡方式是否正確</p></div>`;
+      return;
+    }
+
+    results.innerHTML = '';
+    snap.forEach(doc => {
+      const m = { id: doc.id, ...doc.data() };
+      results.insertAdjacentHTML('beforeend', renderCustomerThread(m));
+    });
+  } catch (err) {
+    console.error(err);
+    results.innerHTML = '<p style="text-align:center;color:var(--red-taiwan)">查詢失敗，請重試</p>';
+  }
+}
+
+function renderCustomerThread(m) {
+  const repliesHtml = (m.replies || []).map(r => `
+    <div class="bubble ${r.role === 'seller' ? 'seller-reply' : 'mine'}">
+      <div class="bubble-inner">${r.content}</div>
+      <div class="bubble-meta">${r.role === 'seller' ? '🌲 賣家回覆' : '您'} · ${r.time || ''}</div>
+    </div>`).join('');
+
+  const hasSellerReply = (m.replies || []).some(r => r.role === 'seller');
+  const statusBadge = hasSellerReply
+    ? '<span class="badge badge-green" style="margin-left:0.5rem">已回覆</span>'
+    : '<span class="badge badge-wood" style="margin-left:0.5rem">等待回覆</span>';
+
+  return `
+  <div class="thread-item">
+    <div class="thread-header" onclick="toggleCustomerThread('${m.id}')">
+      <div>
+        <h4>${m.orderQuery || '一般詢問'} ${statusBadge}</h4>
+        <div class="meta">留言時間：${m.createdAt ? formatDate(m.createdAt) : '–'}</div>
+      </div>
+      <span style="color:var(--ink-mid)">▾</span>
+    </div>
+    <div class="thread-body" id="ctbody-${m.id}">
+      <div class="bubble mine">
+        <div class="bubble-inner">${m.content}</div>
+        <div class="bubble-meta">您 · ${m.createdAt ? formatDate(m.createdAt) : ''}</div>
+      </div>
+      ${repliesHtml}
+      <div class="customer-reply-box">
+        <input type="text" class="form-control" id="creply-${m.id}" placeholder="補充說明或追問…">
+        <button class="btn btn-primary btn-sm" onclick="sendCustomerReply('${m.id}')">送出</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCustomerThread(id) {
+  document.getElementById('ctbody-' + id).classList.toggle('open');
+}
+
+async function sendCustomerReply(id) {
+  const inp  = document.getElementById('creply-' + id);
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  const reply = {
+    role: 'customer', content: text,
+    name: '客戶',
+    time: new Date().toLocaleString('zh-TW'),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    await db.collection('messages').doc(id).update({
+      replies: firebase.firestore.FieldValue.arrayUnion(reply),
+      hasUnread: true,
+    });
+    showToast('已補充說明 ✓', 'success');
+    queryMessages();
+  } catch (err) {
+    showToast('送出失敗', 'error');
+  }
+}
+</script>
+</body>
+</html>
