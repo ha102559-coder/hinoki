@@ -697,7 +697,7 @@ async function saveProduct() {
       name,
       price,
       originalPrice: parseFloat(document.getElementById('pf-orig-price').value) || null,
-      stock: parseInt(document.getElementById('pf-stock').value) ?? null,
+      stock: isNaN(parseInt(document.getElementById('pf-stock').value)) ? null : parseInt(document.getElementById('pf-stock').value),
       category: document.getElementById('pf-category').value.trim() || '精油系列',
       description: document.getElementById('pf-desc').value.trim(),
       imageUrl,
