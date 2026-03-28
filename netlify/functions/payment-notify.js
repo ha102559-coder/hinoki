@@ -5,9 +5,9 @@
 const crypto = require("crypto");
 const https  = require("https");
 
-const HASH_KEY         = "JUi73W4Zh58OsEqE";
-const HASH_IV          = "BjcWioK6rMb3O5Jv";
-const FIREBASE_PROJECT = "hinoki-17ffe";
+const HASH_KEY         = process.env.ECPAY_HASH_KEY;
+const HASH_IV          = process.env.ECPAY_HASH_IV;
+const FIREBASE_PROJECT = process.env.FIREBASE_PROJECT_ID;
 
 // ── 1. 驗證綠界 CheckMacValue ────────────────────────
 function generateCMV(params) {

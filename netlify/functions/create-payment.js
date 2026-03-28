@@ -3,9 +3,9 @@
 
 const crypto = require("crypto");
 
-const MERCHANT_ID = "3103095";
-const HASH_KEY    = "JUi73W4Zh58OsEqE";
-const HASH_IV     = "BjcWioK6rMb3O5Jv";
+const MERCHANT_ID = process.env.ECPAY_MERCHANT_ID;
+const HASH_KEY    = process.env.ECPAY_HASH_KEY;
+const HASH_IV     = process.env.ECPAY_HASH_IV;
 const ECPAY_URL   = "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5";
 
 function generateCheckMacValue(params) {

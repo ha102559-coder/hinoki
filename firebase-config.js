@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 function initFirebase() {
   if (!firebase.apps.length) {
-    firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.initializeApp(firebaseConfig);
   }
   window.db      = firebase.firestore();
   window.auth    = firebase.auth();
@@ -90,6 +90,10 @@ function formatDate(ts) {
 // 產生訂單 ID
 function genOrderId() {
   return 'ORD-' + Date.now() + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+
+function toTradeNo(orderId) {
+  return orderId.replace(/-/g, '');
 }
 
 // Active nav link
