@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hinoki-taiwan.com/sitemap.xml
